@@ -1,0 +1,41 @@
+#Need to update this to actually install everything from the git
+cc /genome/Apps/custom_scripts/code/SMBlank_line_remover.c -o /genome/Apps/custom_scripts/SMBlank_line_remover
+cc /genome/Apps/custom_scripts/code/SMEdge_align_filter.c -o/genome/Apps/custom_scripts/SMEdge_align_filter
+cc /genome/Apps/custom_scripts/code/SMFasta_2_fastq.c -o /genome/Apps/custom_scripts/SMFasta_2_fastq
+cc /genome/Apps/custom_scripts/code/SMFasta_2_gff3.c -o /genome/Apps/custom_scripts/SMFasta_2_gff3
+cc /genome/Apps/custom_scripts/code/SMFasta_compressor.c -o /genome/Apps/custom_scripts/SMFasta_compressor
+cc /genome/Apps/custom_scripts/code/SMFasta_entry_joiner.c -o /genome/Apps/custom_scripts/SMFasta_entry_joiner
+cc /genome/Apps/custom_scripts/code/SMFasta_file_combiner.c -o /genome/Apps/custom_scripts/SMFasta_file_combiner
+cc /genome/Apps/custom_scripts/code/SMFasta_G2N.c -o /genome/Apps/custom_scripts/SMFasta_G2N
+cc /genome/Apps/custom_scripts/code/SMFasta_G2N_comparator.c -o /genome/Apps/custom_scripts/SMFasta_G2N_comparator
+cc /genome/Apps/custom_scripts/code/SMFasta_gap_analyser.c -o /genome/Apps/custom_scripts/SMFasta_gap_analyser -lm
+cc /genome/Apps/custom_scripts/code/SMFasta_interleaver.c -o /genome/Apps/custom_scripts/SMFasta_interleaver
+cc /genome/Apps/custom_scripts/code/SMFasta_title_parser.c -o /genome/Apps/custom_scripts/SMFasta_title_parser
+cc /genome/Apps/custom_scripts/code/SMFastq_coverage_parser.c -o /genome/Apps/custom_scripts/SMFastq_coverage_parser
+cc /genome/Apps/custom_scripts/code/SMFastq_interleaver.c -o /genome/Apps/custom_scripts/SMFastq_interleaver
+cc /genome/Apps/custom_scripts/code/SMFastq_interleave_separator.c -o /genome/Apps/custom_scripts/SMFastq_interleave_separator
+cc /genome/Apps/custom_scripts/code/SMFastq_lengthcheck.c -o /genome/Apps/custom_scripts/SMFastq_lengthcheck
+cc /genome/Apps/custom_scripts/code/SMFastq_linker_trimmer.c -o /genome/Apps/custom_scripts/SMFastq_linker_trimmer
+cc /genome/Apps/custom_scripts/code/SMFastq_size_sorter.c -o /genome/Apps/custom_scripts/SMFastq_size_sorter
+cc /genome/Apps/custom_scripts/code/SMFastq_sortcheck.c -o /genome/Apps/custom_scripts/SMFastq_sortcheck
+cc /genome/Apps/custom_scripts/code/SMFastq_sorter.c -o /genome/Apps/custom_scripts/SMFastq_sorter
+cc /genome/Apps/custom_scripts/code/SMFastq_synchronizer.c -o /genome/Apps/custom_scripts/SMFastq_synchronizer
+cc /genome/Apps/custom_scripts/code/SMFastq_title_parser.c -o /genome/Apps/custom_scripts/SMFastq_title_parser
+cc /genome/Apps/custom_scripts/code/SMGenome_2_MPs.c -o /genome/Apps/custom_scripts/SMGenome_2_MPs
+cc /genome/Apps/custom_scripts/code/SMGenome_2_reads.c -o /genome/Apps/custom_scripts/SMGenome_2_reads
+cc /genome/Apps/custom_scripts/code/SMGff_contig_title_parser.c -o /genome/Apps/custom_scripts/SMGff_contig_title_parser
+cc /genome/Apps/custom_scripts/code/SMGff_fasta_compiler.c -o /genome/Apps/custom_scripts/SMGff_fasta_compiler
+cc /genome/Apps/custom_scripts/code/SMGff_sorter.c -o /genome/Apps/custom_scripts/SMGff_sorter
+cc /genome/Apps/custom_scripts/code/SMGff_stat_parser.c -o /genome/Apps/custom_scripts/SMGff_stat_parser
+cc /genome/Apps/custom_scripts/code/SMMauve_clustal_converter.c -o /genome/Apps/custom_scripts/SMMauve_clustal_converter
+cc /genome/Apps/custom_scripts/code/SMMauve_title_corrector.c -o /genome/Apps/custom_scripts/SMMauve_title_corrector
+cc /genome/Apps/custom_scripts/code/SMMauve_title_parser.c -o /genome/Apps/custom_scripts/SMMauve_title_parser
+cc /genome/Apps/custom_scripts/code/SMNovoalign_parser_PE.c -o /genome/Apps/custom_scripts/SMNovoalign_parser_PE
+cc /genome/Apps/custom_scripts/code/SMNovoalign_parser_SE.c -o /genome/Apps/custom_scripts/SMNovoalign_parser_SE
+cc /genome/Apps/custom_scripts/code/SMPPI_AA_frequency_compiler.c -o /genome/Apps/custom_scripts/SMPPI_AA_frequency_compiler
+cc /genome/Apps/custom_scripts/code/SMPPI_fasta_web_querier.c -o /genome/Apps/custom_scripts/SMPPI_fasta_web_querier -lcurl
+cc /genome/Apps/custom_scripts/code/SMPseudochromosome_assembler.c -o /genome/Apps/custom_scripts/SMPseudochromosome_assembler
+cc /genome/Apps/custom_scripts/code/SMPseudochromosome_gff_updater.c -o /genome/Apps/custom_scripts/SMPseudochromosome_gff_updater
+cc /genome/Apps/custom_scripts/code/SMTitle_comparator.c -o /genome/Apps/custom_scripts/SMTitle_comparator
+cc /genome/Apps/custom_scripts/code/SMTRF_gff_generator.c -o /genome/Apps/custom_scripts/SMTRF_gff_generator
+cc /genome/Apps/custom_scripts/code/SMtRNAscan_gff_generator.c -o /genome/Apps/custom_scripts/SMtRNAscan_gff_generator

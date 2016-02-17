@@ -1,4 +1,4 @@
-/* This program generates a gff3 of TRNAscan data.  It takes a TRNAscan output file as input.  May need some edits when it's used again */
+/* This program generates a gff3 of tRNAscan-SE data.  It takes a TRNAscan output file as input.  May need some edits when it's used again */
 
 //Standard includes, alphabetically
 #include <stdio.h>
@@ -12,13 +12,13 @@ void createOutputFile (FILE **outFile, char *inName);
 //main ()
 int main (int argc, char *argv[]) {
 //Call syntax check
-    if (argc != 3) {
+    if (argc != 2) {
         printf ("Usage: %s tRNAscan_ouput_filename\n", argv[0]);
         exit (1);
     }
 //Main variables
     char line[2000], title[20], type[5], strand;
-    int tstart, tend, temp, istart, iend, count;
+    int tstart, tend, temp, istart, iend, count = 0;
     float score;
     FILE *inFile = NULL, *outFile = NULL;
 //File creation and checks

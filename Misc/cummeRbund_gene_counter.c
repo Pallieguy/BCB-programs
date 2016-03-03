@@ -60,9 +60,8 @@ int main (int argc, char *argv[]) {
             in = fgetc (inFile);
         }
         in = fgetc (inFile);
-        in = fgetc (inFile);
 //Read sample_name
-        while (in != '\"') {
+        while (in != ',') {
             readValueToString (&sample, in);
             in = fgetc (inFile);
         }
@@ -71,7 +70,7 @@ int main (int argc, char *argv[]) {
             copyString (&curSample, &sample);
         }
 //Read the fpkm value and adjust as needed if fpkm isn't 0
-        fscanf (inFile, "%*c%f", &fpkm);
+        fscanf (inFile, "%f", &fpkm);
         if (fpkm != 0) {
 //If it's from the same sample increase the count
             if (strcmp (curSample.str, sample.str) == 0) {

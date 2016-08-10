@@ -207,19 +207,19 @@ void parseTranscriptEntries (fastaEntry *firFasta, FILE *inFile, FILE *outFile) 
     char in;
     int count = 0, start = 0, end = 0;
     long i = 0;
-    string *title = NULL, *sequence = NULL, *scaffold = NULL, *type = NULL;
+    string title, sequence, scaffold, type;
     fastaEntry *curFasta = NULL;
 //Loop the entire process per line of the GTF
     while (1) {
+        in = fgetc (inFile);
 //Stop conditions
         if (((ferror (inFile)) || (feof (inFile)))) {
             break;
         }
 //Read the scaffold
-        initializeString (title);
-        in = fgetc (inFile);
+        initializeString (&scaffold);
         while (in != '\t') {
-            readValueToString (title, in);
+            readValueToString (&scaffold, in);
             in = fgetc (inFile);
         }
 //Skip to entry type
@@ -228,19 +228,19 @@ void parseTranscriptEntries (fastaEntry *firFasta, FILE *inFile, FILE *outFile) 
             in = fgetc (inFile);
         }
 //Read entry type
-        initializeString (type);
+        initializeString (&type);
         in = fgetc (inFile);
         while (in != '\t') {
-            readValueToString (type, in);
+            readValueToString (&type, in);
             in = fgetc (inFile);
         }
 //If the entry is a transcript, process it
-        if (strcmp (type->str, "transcript") == 0) {
+        if (strcmp (type.str, "transcript") == 0) {
 //Prep needed strings
-            initializeString (title);
-            initializeString (sequence);
+            initializeString (&title);
+            initializeString (&sequence);
 //Find start and end values
-            fscanf (inFile, "%*c%d%*c%d", &start, &end);
+            fscanf (inFile, "%d%d", &start, &end);
 //skip to transcript_id
             while (in != ';') {
                 in = fgetc (inFile);
@@ -251,58 +251,57 @@ void parseTranscriptEntries (fastaEntry *firFasta, FILE *inFile, FILE *outFile) 
 //Load transcript_id
             in = fgetc (inFile);
             while (in != '"') {
-                readValueToString (title, in);
+                readValueToString (&title, in);
                 in = fgetc (inFile);
             }
 //Find the corresponding scaffold
             curFasta = firFasta;
-            while (strcmp (curFasta->title.str, scaffold->str) != 0) {
+            while (strcmp (curFasta->title.str, scaffold.str) != 0) {
                 curFasta = curFasta->next;
 //To avoid infinite loops
                 if (curFasta == NULL) {
-                    printf ("%s not found in reference fasta!\n", scaffold->str);
+                    printf ("%s not found in reference fasta!\n", scaffold.str);
                     exit (1);
                 }
             }
 //Copy the sequence substring
-            for (i = (start - 1); i < end; i++) {
-                readValueToString (sequence, curFasta->sequence.str[i]);
+            for (i = (start - 1); i < (end - 1); i++) {
+                readValueToString (&sequence, curFasta->sequence.str[i]);
             }
 //Print the found data in fasta format
-            fprintf (outFile, ">%s\n", title->str);
-            for (i = 0; i < sequence->len; i++) {
-                fprintf (outFile, "%c", sequence->str[i]);
-                if (i % 80 == 0) {
+            fprintf (outFile, ">%s\n", title.str);
+            for (i = 0; i < (sequence.len - 1); i++) {
+                fprintf (outFile, "%c", sequence.str[i]);
+                if ((i > 1) && ((i + 1) % 80 == 0)) {
                     fprintf (outFile, "\n");
                 }
             }
             fprintf (outFile, "\n");
 //Free strings
-            free (sequence->str);
-            sequence->len = 0;
-            free (scaffold->str);
-            scaffold->len = 0;
+            free (sequence.str);
+            sequence.len = 0;
+            free (title.str);
+            title.len = 0;
         }
 //Skip to the end of the line
         while (in != '\n') {
             in = fgetc (inFile);
         }
 //A counter so the user has some idea of how long it will take
-        if (++count % 1000 == 0) {
+        if (++count % 10000 == 0) {
             printf ("%d transcripts parsed...\n", count);
         }
 //Reset transcript entry values
-        free (title->str);
-        title->len = 0;
-        free (type->str);
-        type->len = 0;
+        free (scaffold.str);
+        scaffold.len = 0;
+        free (type.str);
+        type.len = 0;
         start = 0;
         end = 0;
     }
     printf ("%d transcripts parsed.", count);
     return;
 }
-
 //Adds a character to a string, adjsuting size as needed
 void readValueToString (string *string, char in) {
     string->str = realloc (string->str, ++(string->len));

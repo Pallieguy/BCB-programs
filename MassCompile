@@ -26,6 +26,7 @@ cc Fastq-Manipulation/Fastq_synchronizer.c -o Fastq_synchronizer
 cc Fastq-Manipulation/Fastq_title_parser.c -o Fast_title_parser
 cc Gff-Manipulation/Cufflinks_transcript_assembler.c -o Cufflinks_transcript_assembler
 cc Gff-Manipulation/Cufflinks_transcript_counter.c -o Cufflinks_transcript_counter
+cc Gff-Manipulation/Cuffmerge_transcript_assembler.c -o Cuffmerge_transcript_assembler
 cc Gff-Manipulation/Gff_contig_title_parser.c -o Gff_contig_title_parser
 cc Gff-Manipulation/Gff_fasta_compiler.c -o Gff_fasta_compiler
 cc Gff-Manipulation/Gff_sorter.c -o Gff_sorter

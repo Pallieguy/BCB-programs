@@ -34,7 +34,7 @@ int main (int argC, char *argV[]) {
     }
     in = fgetc (inFile);
 //The first one has to be done manually
-    while (in != '\n') {
+    while ((in != '\t') && (in != ' ') && (in != '\n')) {
         fprintf (outFile, "%c", in);
         in = fgetc (inFile);
     }
@@ -49,7 +49,7 @@ int main (int argC, char *argV[]) {
         if (in == '>') {
             fprintf (outFile, "\t%d\t%ld\n", sequenceLength, netSequenceLength);
             in = fgetc (inFile);
-            while (in != '\n') {
+            while ((in != '\t') && (in != ' ') && (in != '\n')) {
                 fprintf (outFile, "%c", in);
                 in = fgetc (inFile);
             }

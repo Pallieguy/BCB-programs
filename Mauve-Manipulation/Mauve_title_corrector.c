@@ -14,16 +14,16 @@ typedef struct string {
 //Entry for the title and size variables
 typedef struct titleEntry {
     string title;
-    int start;
-    int end;
+    long start;
+    long end;
     struct titleEntry *next;
 } titleEntry;
 
 //Entry for the sequence itself
 typedef struct fastaEntry {
     string title;
-    int start;
-    int end;
+    long start;
+    long end;
     int errorCount;
     int errorLength;
     char strand;
@@ -104,7 +104,7 @@ void correctMauveTitle (titleEntry *firTitle, fastaEntry *entry, FILE *inFile) {
     while (in != ':') {
         in = fgetc (inFile);
     }
-    fscanf (inFile, "%d%*c%d%*c%c%*[^\n]%*c", &entry->start, &entry->end, &entry->strand);
+    fscanf (inFile, "%ld%*c%ld%*c%c%*[^\n]%*c", &entry->start, &entry->end, &entry->strand);
 //Find the right title
     while (entry->start > curTitle->end) {
         curTitle = curTitle->next;
@@ -116,6 +116,10 @@ void correctMauveTitle (titleEntry *firTitle, fastaEntry *entry, FILE *inFile) {
 //Collect sequence data
     in = fgetc (inFile);
     while ((in != '>') && (in != '=')) {
+//Stop conditions, incase it reaches the end of the file
+        if (((ferror (inFile)) || (feof (inFile)))) {
+            break;
+        }
         if (in != '\n') {
             readValueToString (&entry->sequence, in);
         }
@@ -356,12 +360,11 @@ void loadError (fastaEntry *entry, titleEntry *curTitle, fastaEntry *check) {
     return;
 }
 
-
 //Fill a DLL with titles and size values
 void loadTitles (titleEntry *firTitle, FILE *inFile) {
 //Local variables
     titleEntry *curTitle = NULL, *prevTitle = NULL;
-    int start = 1;
+    long start = 1;
     char in;
     curTitle = firTitle;
 //One character at a time
@@ -371,36 +374,24 @@ void loadTitles (titleEntry *firTitle, FILE *inFile) {
         if (((ferror (inFile)) || (feof (inFile)))) {
             break;
         }
-//Skip the > if need be
-        if (in == '>') {
-            in = fgetc (inFile);
-        }
 //Read the title
-        while ((in != '\t') && (in != '\n')) {
+        while (in != '\t') {
             readValueToString (&curTitle->title, in);
             in = fgetc (inFile);
         }
-//Skip the rest of the title line
-        if (in == '\t') {
-            while (in != '\n') {
-                in = fgetc (inFile);
-            }
+//Read the start/end positions
+        fscanf (inFile, "%ld", &curTitle->end);
+        curTitle->start = start;
+        curTitle->end += start;
+        start = curTitle->end + 1;
+//Burn the rest of the line
+        while (in != '\n') {
+//Break conditions incase there's only one entry
+        if (((ferror (inFile)) || (feof (inFile)))) {
+            break;
         }
-//Read the start/end point
-        in = fgetc (inFile);
-        curTitle->end = start;
-        while (in != '>') {
-//Break conditions
-            if (((ferror (inFile)) || (feof (inFile)))) {
-                break;
-            }
-            if (in != '\n') {
-                curTitle->end++;
-            }
             in = fgetc (inFile);
         }
-        curTitle->start = start;
-        start = curTitle->end + 1;
 //Move to next node
         createTitleEntry (&curTitle->next);
         prevTitle = curTitle;
@@ -468,7 +459,7 @@ void printFastaEntries (fastaEntry *firEntry, fastaEntry *secEntry, FILE *outFil
 //Do the actual printing
 void printFastaEntry (fastaEntry *entry, FILE *outFile) {
     int i;
-    fprintf (outFile, "> %s:%d-%d %c", entry->title.str, entry->start, entry->end, entry->strand);
+    fprintf (outFile, "> %s:%ld-%ld %c", entry->title.str, entry->start, entry->end, entry->strand);
     for (i = 0; i < (entry->sequence.len - 1); i++) {
         if ((i % 80) == 0) {
             fprintf (outFile, "\n");

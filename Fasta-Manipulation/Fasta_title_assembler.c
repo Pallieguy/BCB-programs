@@ -15,7 +15,6 @@ typedef struct string {
 typedef struct fastaEntry {
     string title;
     string sequence;
-    struct fastaEntry *prev;
     struct fastaEntry *next;
 } fastaEntry;
 
@@ -117,12 +116,14 @@ void createOutputFile (FILE **outFile, char *inName) {
 }
 
 //Goes through a text file of fasta titles and finds the corresponding entries
-void findTitle (fastaEntry *curFasta, FILE *inFile, FILE *outFile) {
+void findTitle (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
 //Local variables
     string title;
     char in;
     int count = 0;
+    fastaEntry *curFasta = NULL;
     while (1) {
+        curFasta = firFasta;
         in = fgetc (inFile);
         initializeString (&title);
 //Break conditions
@@ -135,8 +136,12 @@ void findTitle (fastaEntry *curFasta, FILE *inFile, FILE *outFile) {
             in = fgetc (inFile);
         }
 //Load the title
-        while (in != '\n') {
+        while ((in != ' ') && (in != '\t') && (in != '\n')) {
             readValueToString (&title, in);
+            in = fgetc (inFile);
+        }
+//Burn the rest of the line
+        while (in != '\n') {
             in = fgetc (inFile);
         }
 //Find the title in the fastaEntry list
@@ -144,11 +149,6 @@ void findTitle (fastaEntry *curFasta, FILE *inFile, FILE *outFile) {
             if (curFasta == NULL) {
                 printf ("%s not found in fasta file!\n", title.str);
                 exit (1);
-            }
-//If the title is earlier
-            if (strcmp (title.str, curFasta->title.str) < 0) {
-                curFasta = curFasta->prev;
-//If the title is later
             } else {
                 curFasta = curFasta->next;
             }
@@ -157,7 +157,7 @@ void findTitle (fastaEntry *curFasta, FILE *inFile, FILE *outFile) {
         fprintf (outFile, "%s\n%s", curFasta->title.str, curFasta->sequence.str);
         free (title.str);
 //A counter so the user has some idea of how long it will take
-        if (++count % 100 == 0){
+        if (++count % 1000 == 0){
             printf ("%d entries parsed...\n", count);
         }
     }
@@ -170,7 +170,6 @@ void initializeFastaEntry (fastaEntry *newFasta) {
     initializeString (&(*newFasta).title);
     initializeString (&(*newFasta).sequence);
     newFasta->next = NULL;
-    newFasta->prev = NULL;
     return;
 }
 
@@ -218,7 +217,6 @@ void loadFastaList (fastaEntry *curFasta, FILE *inFile) {
         if (in == '>') {
             curFasta->next = malloc (sizeof (*curFasta->next));
             initializeFastaEntry (curFasta->next);
-            curFasta->next->prev = curFasta;
             curFasta = curFasta->next;
         }
 //A counter so the user has some idea of how long it will take

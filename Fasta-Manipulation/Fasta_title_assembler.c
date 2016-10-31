@@ -1,4 +1,4 @@
-/* This program generates a pseudochromosomal fasta using BLASTN alignment of known markers to an established assembly as anchors, filling the resutling gaps with 'N'.  It takes an assembled genome fasta file, and a curated BLASTN output file as input. */
+/* This program generates a fasta from a source fasta and a subset of fasta titles.  It takes a fasta and a title list as input */
 
 //Standard includes, alphabetically
 #include <stdio.h>

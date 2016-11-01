@@ -26,7 +26,6 @@ cc Fastq-Manipulation/Fastq_synchronizer.c -o Fastq_synchronizer
 cc Fastq-Manipulation/Fastq_title_parser.c -o Fast_title_parser
 cc Gff-Manipulation/Cufflinks_transcript_assembler.c -o Cufflinks_transcript_assembler
 cc Gff-Manipulation/Cufflinks_transcript_counter.c -o Cufflinks_transcript_counter
-cc Gff-Manipulation/Cuffmerge_transcript_assembler.c -o Cuffmerge_transcript_assembler
 cc Gff-Manipulation/Gff_contig_title_parser.c -o Gff_contig_title_parser
 cc Gff-Manipulation/Gff_fasta_compiler.c -o Gff_fasta_compiler
 cc Gff-Manipulation/Gff_sorter.c -o Gff_sorter
@@ -38,6 +37,9 @@ cc Misc/Blank_line_remover.c -o Blank_line_remover
 cc Misc/cummeRbund_gene_counter.c -o cummeRbund_gene_counter
 cc Misc/Fasta_G2N_comparator.c -o Fasta_G2N_comparator
 cc Misc/Title_comparator.c -o Title_comparator
+cc Misc/Title_interleaver.c -o Title_interleaver
+cc Misc/Title_numberer.c -o Title_numberer
+cc Misc/Title_uniqueness_parser.c -o Title_uniqueness_parser
 cc Misc/Title_uniqueness_verifier.c -o Title_uniqueness_verifier
 cc Old/Edge_align_filter.c -o Edge_align_filter
 cc Old/Novoalign_parser_PE.c -o Novoalign_parser_PE

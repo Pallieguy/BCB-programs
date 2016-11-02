@@ -13,6 +13,7 @@ typedef struct string {
 
 //Standard data from a fasta entry
 typedef struct titleEntry {
+    string source;
     string scaffold;
     int start;
     int end;
@@ -22,6 +23,7 @@ typedef struct titleEntry {
 } titleEntry;
 
 //List of functions, alphabetically
+void copyString (string *dest, string *source);
 void createFile (FILE **file, char *fName, char perm);
 void createOutputFile (FILE **outFile, char *inName);
 void freeTitleEntry (titleEntry *oldEntry);
@@ -67,6 +69,16 @@ int main (int argc, char *argv[]) {
     fclose (outFile);
     printf ("Done.\n");
     return 0;
+}
+
+//Replaces the values of one string with another
+void copyString (string *destination, string *source) {
+    int i;
+    reinitializeString (destination);
+    for (i = 0; i < source->len; i++) {
+        readValueToString (destination, source->str[i]);
+    }
+    return;
 }
 
 //Create and check a file opening
@@ -128,13 +140,15 @@ void createOutputFile (FILE **outFile, char *inName) {
 
 //Frees the memory used by a fastaEntry node
 void freeTitleEntry (titleEntry *oldEntry) {
+    free (oldEntry->source.str);
     free (oldEntry->scaffold.str);
-    free (oldEntry->next);
+    oldEntry->next = NULL;
     return;
 }
 
 //Sets the minimum values to a fastaEntry
 void initializeTitleEntry (titleEntry *newEntry) {
+    initializeString (&newEntry->source);
     initializeString (&newEntry->scaffold);
     newEntry->start = 0;
     newEntry->end = 0;
@@ -156,9 +170,13 @@ void initializeString (string *newString) {
 void interleaveTitles (titleEntry *firEntry1, titleEntry *firEntry2, FILE *outFile) {
 //Local variables
     titleEntry *curEntry = NULL;
-    int lastPrint = 0;
-//point curEntry at something to start
+    int lastPrint = 0, count = 0;
+    string curScaffold;
+//Prep curEntry, curScaffold, and the outFile
     curEntry = firEntry1;
+    initializeString (&curScaffold);
+    copyString (&curScaffold, &curEntry->scaffold);
+    fprintf (outFile, "Source,Scaffold,start,end,size,strand\n");
 //Loop the process
     while (1) {
 //Break once both lists are exhausted
@@ -167,57 +185,97 @@ void interleaveTitles (titleEntry *firEntry1, titleEntry *firEntry2, FILE *outFi
         }
 //If there's still entries in each list
         if ((firEntry1 != NULL) && (firEntry2 != NULL)) {
+//If list2 has moved to a new scaffold
+            if ((strcmp (firEntry1->scaffold.str, curScaffold.str) == 0) && (strcmp (firEntry2->scaffold.str, curScaffold.str) > 0)) {
+//And list one has not finished that scaffold
+                if (strcmp (firEntry1->scaffold.str, curScaffold.str) == 0) {
+//Print the current entry
+                    curEntry = firEntry1;
+                    printTitleEntry (curEntry, outFile);
+                    lastPrint = 1;
+//Burn the rest of the list1 entries on that scaffold
+                    while (strcmp (curEntry->scaffold.str, curScaffold.str) == 0) {
+                        firEntry1 = firEntry1->next;
+                        freeTitleEntry (curEntry);
+                        curEntry = firEntry1;
+                    }
+                }
+//If list1 has moved to a new scaffold
+            } else if ((strcmp (firEntry2->scaffold.str, curScaffold.str) == 0) && (strcmp (firEntry1->scaffold.str, curScaffold.str) > 0)) {
+//And list one has not finished that scaffold
+                if (strcmp (firEntry2->scaffold.str, curScaffold.str) == 0) {
+//Print the current entry
+                    curEntry = firEntry2;
+                    printTitleEntry (curEntry, outFile);
+                    lastPrint = 2;
+//Burn the rest of the list1 entries on that scaffold
+                    while (strcmp (curEntry->scaffold.str, curScaffold.str) == 0) {
+                        firEntry2 = firEntry2->next;
+                        freeTitleEntry (curEntry);
+                        curEntry = firEntry2;
+                    }
+                }
+//If both lists are on the same scaffold find the earlier list
+            } else if (strcmp (firEntry1->scaffold.str, firEntry2->scaffold.str) == 0) {
 //If list1 is earlier
-            if (firEntry1->start < firEntry2->start) {
-                curEntry = firEntry1->next;
-//Find the last entry before the first entry on list2
-                while (curEntry->start < firEntry2->start) {
-                    freeTitleEntry (firEntry1);
-                    firEntry1 = curEntry;
-                    curEntry = firEntry1->next;
-               }
+                if (firEntry1->start < firEntry2->start) {
+                     curEntry = firEntry1->next;
+//Make sure both lists are on the same scaffold and find the last entry before the first entry on list2
+                     while ((strcmp (curEntry->scaffold.str, curScaffold.str) == 0) && (strcmp (firEntry2->scaffold.str, curScaffold.str) == 0) && (curEntry->start < firEntry2->start)) {
+                         freeTitleEntry (firEntry1);
+                         firEntry1 = curEntry;
+                         curEntry = firEntry1->next;
+                    }
 //Check that there isn't an impossible overlap
-               if (firEntry1->end > firEntry2->start) {
-                   printf ("%s:%s,%d,%d,%d,%c\nOVERLAPS\n%s:%s,%d,%d,%d,%c\n", argv(1), firEntry1->scaffold.str, firEntry1->start, firEntry1->end, firEntry1->size, firEntry1->strand, argv(2), firEntry2->scaffold.str, firEntry2->start, firEntry2->end, firEntry2->size, firEntry2->strand, );
-                   exit (1);
-               }
+                    if (firEntry1->end > firEntry2->start) {
+                        printf ("%s:%s,%d,%d,%d,%c\nOVERLAPS\n%s:%s,%d,%d,%d,%c\n", firEntry1->source.str, firEntry1->scaffold.str, firEntry1->start, firEntry1->end, firEntry1->size, firEntry1->strand, firEntry2->source.str, firEntry2->scaffold.str, firEntry2->start, firEntry2->end, firEntry2->size, firEntry2->strand);
+                        exit (1);
+                    }
 //Print the proper entry
-               curEntry = firEntry1;
-               printTitleEntry (curEntry, outFile);
-               lastPrint = 1;
+                    curEntry = firEntry1;
+                    printTitleEntry (curEntry, outFile);
+                    lastPrint = 1;
 //Remove the printed entry
-               firEntry1 = firEntry1->next;
-               freeTitleEntry (curEntry);
-               curEntry = firEntry1;
-            }
+                    firEntry1 = firEntry1->next;
+                    freeTitleEntry (curEntry);
+                    curEntry = firEntry1;
+                }
 //If list2 is earlier
-            if (firEntry2->start < firEntry1->start) {
-                curEntry = firEntry1->next;
-//Find the last entry before the first entry on list2
-                while (curEntry->start < firEntry1->start) {
-                    freeTitleEntry (firEntry2);
-                    firEntry2 = curEntry;
-                    curEntry = firEntry2->next;
-               }
+                if (firEntry2->start < firEntry1->start) {
+                     curEntry = firEntry2->next;
+//Make sure both lists are on the same scaffold and find the last entry before the first entry on list1
+                     while ((strcmp (curEntry->scaffold.str, curScaffold.str) == 0) && (strcmp (firEntry1->scaffold.str, curScaffold.str) == 0) && (curEntry->start < firEntry1->start)) {
+                         freeTitleEntry (firEntry2);
+                         firEntry2 = curEntry;
+                         curEntry = firEntry2->next;
+                    }
 //Check that there isn't an impossible overlap
-               if (firEntry2->end > firEntry1->start) {
-                   printf ("%s:%s,%d,%d,%d,%c\nOVERLAPS\n%s:%s,%d,%d,%d,%c\n", argv(2), firEntry2->scaffold.str, firEntry2->start, firEntry2->end, firEntry2->size, firEntry2->strand, argv(1), firEntry1->scaffold.str, firEntry1->start, firEntry1->end, firEntry1->size, firEntry1->strand, );
-                   exit (1);
-               }
+                    if (firEntry2->end > firEntry1->start) {
+                        printf ("%s:%s,%d,%d,%d,%c\nOVERLAPS\n%s:%s,%d,%d,%d,%c\n", firEntry2->source.str, firEntry2->scaffold.str, firEntry2->start, firEntry2->end, firEntry2->size, firEntry2->strand, firEntry1->source.str, firEntry1->scaffold.str, firEntry1->start, firEntry1->end, firEntry1->size, firEntry1->strand);
+                        exit (1);
+                    }
 //Print the proper entry
-               curEntry = firEntry2;
-               printTitleEntry (curEntry, outFile);
-               lastPrint = 2;
+                    curEntry = firEntry2;
+                    printTitleEntry (curEntry, outFile);
+                    lastPrint = 2;
 //Remove the printed entry
-               firEntry2 = firEntry2->next;
-               freeTitleEntry (curEntry);
-               curEntry = firEntry2;
-            }            
+                    firEntry2 = firEntry2->next;
+                    freeTitleEntry (curEntry);
+                    curEntry = firEntry2;
+                }
+//Otherwise curScaffold needs to be updated to the new lowest scaffold
+            } else {
+                if (strcmp (firEntry1->scaffold.str, firEntry2->scaffold.str) < 0) {
+                    copyString (&curScaffold, &firEntry1->scaffold);
+                } else {
+                    copyString (&curScaffold, &firEntry2->scaffold);
+                }
+            }
 //If the first list is empty
         } else if (firEntry1 == NULL) {
             curEntry = firEntry2;
 //If last list used was 1, print an entry
-            if (lasPrint == 1) {
+            if (lastPrint == 1) {
                 printTitleEntry (curEntry, outFile);
                 lastPrint = 2;
             }
@@ -228,13 +286,17 @@ void interleaveTitles (titleEntry *firEntry1, titleEntry *firEntry2, FILE *outFi
         } else if (firEntry2 == NULL) {
             curEntry = firEntry1;
 //If last list used was 2, print an entry
-            if (lasPrint == 2) {
+            if (lastPrint == 2) {
                 printTitleEntry (curEntry, outFile);
                 lastPrint = 1;
             }
 //Delete the entry
             firEntry1 = firEntry1->next;
             freeTitleEntry (curEntry);
+        }
+//A counter so the user has some idea of how long it will take
+        if (++count % 1000 == 0) {
+            printf ("%d titles loaded...\n", count);
         }
     }
     return;
@@ -246,19 +308,34 @@ void loadTitleEntryList (titleEntry *firEntry, FILE *inFile) {
     char in;
     int count = 0;
     titleEntry *curEntry = NULL, *prevEntry = NULL;
-//Find the first entry
+    string source;
+//Prep variables
     in = fgetc (inFile);
+    curEntry = firEntry;
+    prevEntry = firEntry;
+    initializeString (&source);
+//Find the source
+    while (in != ' ') {
+        in = fgetc (inFile);
+    }
+//Load the source
+    in = fgetc (inFile);
+    while (in != ' ') {
+        readValueToString (&source, in);
+        in = fgetc (inFile);
+    }
+//Find the first entry
     while (in != '>') {
         in = fgetc (inFile);
     }
-    curEntry = firEntry;
-    prevEntry = firEntry;
 //Loop the rest
     while (1) {
 //Break conditions
         if (((ferror (inFile)) || (feof (inFile)))) {
             break;
         }
+//Copy the source
+        copyString (&curEntry->source, &source);
 //Read the scaffold
         in = fgetc (inFile);
         while ((in != ',') && (in != ' ') && (in != '\t') && (in != '\n')) {
@@ -298,7 +375,7 @@ void loadTitleEntryList (titleEntry *firEntry, FILE *inFile) {
 
 //Print the contents of an entry
 void printTitleEntry (titleEntry *entry, FILE *outFile) {
-    
+    fprintf (outFile, "%s,>%s,%d,%d,%d,%c\n", entry->source.str, entry->scaffold.str, entry->start, entry->end, entry->size, entry->strand);
     return;
 }
 

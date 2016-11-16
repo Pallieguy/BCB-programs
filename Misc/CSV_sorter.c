@@ -453,7 +453,7 @@ static node* single_rotate_with_right (node* k1) {
 
 /* Write data of a node to file. */
 node* write (node* current_node, FILE *outFile) {
-    fprintf (outFile, "%s,%ld-%ld,%d,%c,%s,%ld-%ld,%d,%c\n", current_node->source.str, current_node->sstart, current_node->send, current_node->ssize, current_node->sstrand, current_node->destination.str, current_node->dstart, current_node->dend, current_node->dsize, current_node->dstrand);
+    fprintf (outFile, "%s,%ld,%ld,%d,%c,%s,%ld,%ld,%d,%c\n", current_node->source.str, current_node->sstart, current_node->send, current_node->ssize, current_node->sstrand, current_node->destination.str, current_node->dstart, current_node->dend, current_node->dsize, current_node->dstrand);
     return current_node;
 }
 

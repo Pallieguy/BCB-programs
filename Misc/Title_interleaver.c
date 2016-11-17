@@ -23,7 +23,7 @@ typedef struct titleEntry {
 } titleEntry;
 
 //List of functions, alphabetically
-void copyString (string *dest, string *source);
+void copyString (string *destination, string *source);
 void createFile (FILE **file, char *fName, char perm);
 void createOutputFile (FILE **outFile, char *inName);
 void freeTitleEntry (titleEntry *oldEntry);
@@ -314,7 +314,7 @@ void loadTitleEntryList (titleEntry *firEntry, FILE *inFile) {
     curEntry = firEntry;
     prevEntry = firEntry;
     initializeString (&source);
-//Find the source
+//Skip to the source
     while (in != ' ') {
         in = fgetc (inFile);
     }
@@ -338,7 +338,7 @@ void loadTitleEntryList (titleEntry *firEntry, FILE *inFile) {
         copyString (&curEntry->source, &source);
 //Read the scaffold
         in = fgetc (inFile);
-        while ((in != ',') && (in != ' ') && (in != '\t') && (in != '\n')) {
+        while (in != ',') {
             readValueToString (&curEntry->scaffold, in);
             in = fgetc (inFile);
         }

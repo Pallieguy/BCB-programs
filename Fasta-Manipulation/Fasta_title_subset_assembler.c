@@ -1,4 +1,4 @@
-/* This program generates a fasta from a source fasta and a subset of fasta titles with start and end points.  It takes a fasta and a title list as input */
+/* This program generates a fasta from a source fasta and a subset of fasta titles with start and end points.  It takes a fasta and a title list as input. */
 
 //Standard includes, alphabetically
 #include <stdio.h>
@@ -156,13 +156,9 @@ void findTitle (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
                 curFasta = curFasta->next;
             }
         }
-//Print the matching fastaEntry subset and reset the 
-        fprintf (outFile, "%s\n", curFasta->title.str);
-        for (--start; start < end; start++) {
-            if (curFasta->sequence.str[start] == '\n') {
-                start++;
-                end++;
-            }
+//Print the matching fastaEntry subset and reset the locals
+        fprintf (outFile, "%s_%d-%d\n", curFasta->title.str, start, end);
+        for (start; start < end; start++) {
             fprintf (outFile, "%c", curFasta->sequence.str[start]);
         }
         fprintf (outFile, "\n");
@@ -221,7 +217,9 @@ void loadFastaList (fastaEntry *curFasta, FILE *inFile) {
             if (((ferror (inFile)) || (feof (inFile)))) {
                 break;
             }
-            readValueToString (&curFasta->sequence, in);
+            if (in != '\n') {
+                readValueToString (&curFasta->sequence, in);
+            }
             in = fgetc (inFile);
         }
 //Load the next fastaEntry

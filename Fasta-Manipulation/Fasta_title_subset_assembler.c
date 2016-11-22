@@ -159,6 +159,10 @@ void findTitle (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
 //Print the matching fastaEntry subset and reset the 
         fprintf (outFile, "%s\n", curFasta->title.str);
         for (--start; start < end; start++) {
+            if (curFasta->sequence.str[start] == '\n') {
+                start++;
+                end++;
+            }
             fprintf (outFile, "%c", curFasta->sequence.str[start]);
         }
         fprintf (outFile, "\n");

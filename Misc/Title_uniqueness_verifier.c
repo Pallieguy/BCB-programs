@@ -14,6 +14,7 @@ typedef struct string {
 //To store all the titles in a linked manner
 typedef struct titleEntry {
     string title;
+    string remainder;
     struct titleEntry *next;
 } titleEntry;
 
@@ -57,7 +58,7 @@ int main (int argc, char *argv[]) {
 //Find the title entry
         if (in == '>') {
 //Load the title
-            while (in != '\n') {
+            while ((in != ':') && (in != ' ') && (in != '\t') && (in != '\n')) {
                 readValueToString (&title, in);
                 in = fgetc (inFile);
             }
@@ -71,6 +72,10 @@ int main (int argc, char *argv[]) {
             }
             if (curEntry->title.len == 1) {
                 copyString (&title, &curEntry->title);
+                while (in != '\n') {
+                    readValueToString (&curEntry->remainder, in);
+                    in = fgetc (inFile);
+                }
                 initializeTitleEntry (&curEntry->next);
             }
         reinitializeString (&title);
@@ -80,8 +85,11 @@ int main (int argc, char *argv[]) {
 //Print out and free the unique title list
     curEntry = firEntry;
     while (curEntry != NULL) {
-        fprintf (outFile, "%s\n", curEntry->title.str);
+        fprintf (outFile, "%s%s", curEntry->title.str, curEntry->remainder.str);
         curEntry = curEntry->next;
+        if (curEntry != NULL) {
+            fprintf (outFile, "\n");
+        }
         freeTitleEntry (firEntry);
         firEntry = curEntry;
 //A counter so the user has some idea of how long it will take
@@ -166,6 +174,7 @@ void createOutputFile (FILE **outFile, char *inName) {
 //Frees the memory used by a titleEntry node
 void freeTitleEntry (titleEntry *oldEntry) {
     free (oldEntry->title.str);
+    free (oldEntry->remainder.str);
     free (oldEntry);
     return;
 }
@@ -174,6 +183,7 @@ void freeTitleEntry (titleEntry *oldEntry) {
 void initializeTitleEntry (titleEntry **newEntry) {
     *newEntry = malloc (sizeof (**newEntry));
     initializeString (&(*newEntry)->title);
+    initializeString (&(*newEntry)->remainder);
     (*newEntry)->next = NULL;
     return;
 }

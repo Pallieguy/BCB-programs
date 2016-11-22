@@ -161,6 +161,7 @@ void findTitle (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
         for (--start; start < end; start++) {
             fprintf (outFile, "%c", curFasta->sequence.str[start]);
         }
+        fprintf (outFile, "\n");
         free (title.str);
 //A counter so the user has some idea of how long it will take
         if (++count % 1000 == 0){

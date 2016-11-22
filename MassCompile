@@ -10,6 +10,7 @@ cc Fasta-Manipulation/Fasta_gap_analyzer.c -o Fasta_gap_analyzer -lm
 cc Fasta-Manipulation/Fasta_interleaver.c -o Fasta_interleaver
 cc Fasta-Manipulation/Fasta_sorter.c -o Fasta_sorter
 cc Fasta-Manipulation/Fasta_title_assembler.c -o Fasta_title_assembler
+cc Fasta-Manipulation/Fasta_title_subset_assembler.c -o Fasta_title_subset_assembler
 cc Fasta-Manipulation/Fasta_title_parser.c -o Fasta_title_parser
 cc Fasta-Manipulation/Genome_2_MPs.c -o Genome_2_MPs
 cc Fasta-Manipulation/Genome_2_reads.c -o Genome_2_reads

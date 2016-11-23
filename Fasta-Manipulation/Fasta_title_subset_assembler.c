@@ -157,7 +157,7 @@ void findTitle (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
             }
         }
 //Print the matching fastaEntry subset and reset the locals
-        fprintf (outFile, "%s_%d-%d\n", curFasta->title.str, start, end);
+        fprintf (outFile, "%s_%d-%d\n", curFasta->title.str, start--, end--);
         for (start; start < end; start++) {
             fprintf (outFile, "%c", curFasta->sequence.str[start]);
         }

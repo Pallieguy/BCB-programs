@@ -1,4 +1,4 @@
-/* This program turns the gene entries in a gff3 into a fasta.  It takes a gff3 and a fasta file as input. */
+/* This program turns the gene or transcript entries in a gff3 into a fasta.  It takes a gff3 and a fasta file as input. */
 
 //Standard includes, alphabetically
 #include <stdio.h>
@@ -339,8 +339,8 @@ void loadGffList (gff *firGff, FILE *inFile) {
                 readValueToString (&curGff->type, in);
                 in = fgetc (inFile);
             }
-//Only copy gene entries
-            if (strcmp (curGff->type.str, "gene") == 0) { //Removed to cover all entries */
+//Only copy gene or transcript entries
+            if ((strcmp (curGff->type.str, "gene") == 0) || (strcmp (curGff->type.str, "transcript") == 0)) { //Removed to cover all entries */
 //Read the start, end, and strand
                 fscanf (inFile, "%d%d%*c%*c%*c%c%*c%*c%*c", &curGff->start, &curGff->end, &curGff->strand);
                 in = fgetc (inFile);

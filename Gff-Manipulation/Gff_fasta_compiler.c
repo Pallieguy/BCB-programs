@@ -301,9 +301,12 @@ void loadGffList (gff *firGff, FILE *inFile) {
     int count = 0;
     char in;
     gff *curGff = firGff, *prevGff = NULL;
-//Skip the gff header line
+//Skip header lines
     in = fgetc (inFile);
-    while (in != '\n') {
+    while (in == '#') {
+        while (in != '\n') {
+            in = fgetc (inFile);
+        }
         in = fgetc (inFile);
     }
 //Loop for the whole file

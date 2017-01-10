@@ -301,12 +301,9 @@ void loadGffList (gff *firGff, FILE *inFile) {
     int count = 0;
     char in;
     gff *curGff = firGff, *prevGff = NULL;
-//Skip header lines
+//Skip the gff header line
     in = fgetc (inFile);
-    while (in == '#') {
-        while (in != '\n') {
-            in = fgetc (inFile);
-        }
+    while (in != '\n') {
         in = fgetc (inFile);
     }
 //Loop for the whole file
@@ -320,11 +317,8 @@ void loadGffList (gff *firGff, FILE *inFile) {
         if (in == '#') {
             while (in != '\n') {
                 in = fgetc (inFile);
-//In case it's the end of the file
-                if (feof) {
-                    break;
-                }
             }
+            count--;
         } else {
 //Read the scaffold
             while (in != '\t') {
@@ -391,7 +385,7 @@ void loadGffList (gff *firGff, FILE *inFile) {
 //In either case empty type
         }
 //A counter so the user has some idea of how long it will take
-        if (++count % 50000 == 0) {
+        if ((++count % 50000 == 0) && (count != 0)) {
             printf ("%d entries loaded...\n", count);
         }
     }
@@ -418,7 +412,7 @@ void printfGffEntries (gff *curGff, fasta *firFasta, FILE *outFile) {
             curFasta = curFasta->next;
 //In case an entry is missing
             if (curFasta == NULL) {
-                printf ("%s not found in fasta file!\n", curGff->scaffold.str);
+                printf ("\"%s\" not found in fasta file!\n", curGff->scaffold.str);
                 exit (3);
             }
         }

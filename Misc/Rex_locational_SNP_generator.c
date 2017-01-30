@@ -27,9 +27,7 @@ void freeFastaList (fasta *firFasta);
 void initializeFasta (fasta *newFasta);
 void initializeString (string *newString);
 void loadFastaList (fasta *firFasta, FILE *inFile);
-void printSNPEntries (fasta *entry, FILE *outFile);
 void readValueToString (string *string, char in);
-void reinitializeString (string *oldString);
 
 //main ()
 int main (int argC, char *argV[]) {
@@ -54,10 +52,10 @@ int main (int argC, char *argV[]) {
     fclose (fInFile);
 //Print SNP referenced sequences
     printf ("  Finding SNP sequences...\n");
-    findSNPs (firFasta, bInFile outFile);
+    findSNPs (firFasta, bInFile, outFile);
 //Close everything and free memory
     printf ("  Closing files and freeing memory...\n");
-    fclose (binFile);
+    fclose (bInFile);
     freeFastaList (firFasta);
     fclose (outFile);
     return 0;
@@ -123,40 +121,86 @@ void createOutputFile (FILE **outFile, char *inName) {
 //Finds the fasta sequences identified by SNP coordinates
 void findSNPs (fasta *firFasta, FILE *inFile, FILE *outFile) {
 //Local variables
-    int count = 0, start, end;
+    int count = 0;
     string title, label;
-    char strand, in;
+    char in;
     fasta *curFasta = NULL;
-    initializeString (&location);
-    initializeString (&title);
-    initializeString (&label);
 //Loop to cover SNP list
-    while (0) {
+    while (1) {
+        in = fgetc (inFile);
 //Stop conditions
         if (((ferror (inFile)) || (feof (inFile)))) {
             break;
         }
-//Reset the Fasta
+//Reset the variables
         curFasta = firFasta;
+        initializeString (&label);
+        initializeString (&title);
 //Load the current SNP match from the BLAST file
-        in = fgetc (inFile);
+//Chromosome
         while (in != '\t') {
-            readValueToString (title, in);
+            readValueToString (&title, in);
             in = fgetc (inFile);
         }
-        fscanf (inFile, "%d%d%c", &start, &end, &strand);
+        readValueToString (&title, '_');
+//Start
+        in = fgetc (inFile);
+        while (in != '\t') {
+            readValueToString (&title, in);
+            in = fgetc (inFile);
+        }
+        readValueToString (&title, '-');
+//End
+        in = fgetc (inFile);
+        while (in != '\t') {
+            readValueToString (&title, in);
+            in = fgetc (inFile);
+        }
+        readValueToString (&title, '_');
+//Strand
+        in = fgetc (inFile);
+        while (in != '\t') {
+            readValueToString (&title, in);
+            in = fgetc (inFile);
+        }
+//Load the original SNP label
+        in = fgetc (inFile);
+        while (in != '\t') {
+            readValueToString (&label, in);
+            in = fgetc (inFile);
+        }
 //Burn the rest of the BLAST line
-
+        while (in != '\n') {
+            in = fgetc (inFile);
+        }
 //Find the corresponding first entry
-
+        readValueToString (&label, '-');
+        readValueToString (&label, '1');
+        while (strcmp (curFasta->title.str, label.str) != 0) {
+            curFasta = curFasta->next;
+            if (curFasta == NULL) {
+                printf ("%s not found in fasta!\n", label.str);
+                exit (2);
+            }
+        }
 //Print it
-
+        fprintf (outFile, ">%s-1\n%s\n", title.str, curFasta->sequence.str);
 //Find the corresponding second entry
-
+        label.str[label.len - 2] = '2';
+        while (strcmp (curFasta->title.str, label.str) != 0) {
+            curFasta = curFasta->next;
+            if (curFasta == NULL) {
+                printf ("%s not found in fasta!\n", label.str);
+                exit (2);
+            }
+        }
 //Print it
-
+        fprintf (outFile, ">%s-2\n%s\n", title.str, curFasta->sequence.str);
 //Drop the current SNP data
-
+        free (label.str);
+        label.len = 0;
+        free (title.str);
+        title.len = 0;
 //A counter so the user has some idea of how long it will take
         if (++count % 1000 == 0) {
             printf ("%d entries written...\n", count);
@@ -261,8 +305,3 @@ void readValueToString (string *string, char in) {
     string->str[(string->len - 1)] = '\0';
     return;
 }
-
-void reinitializeString (string *oldString) {
-
-    return;
-)

@@ -50,6 +50,7 @@ cc Protein-Protein-Interaction/PPI_AA_frequency_compiler.c -o PPI_AA_frequency_c
 cc Protein-Protein-Interaction/PPI_fasta_web_querier.c -o PPI_fasta_web_querier -lcurl
 cc Pseudochromosomes/Pseudochromosome_assembler.c -o Pseudochromosome_assembler
 cc Pseudochromosomes/Pseudochromosome_gff_updater.c -o Psuedochromosome_gff_ipdater
+cc Pseudochromosomes/Rex_locational_SNP_generator.c -o Rex_locational_SNP_generator
 cc TEs/LTR_Finder_gff_generator.c -o LTR_Finder_gff_generator
 cc TEs/TRF_gff_generator.c -o TRF_gff_generator
 cc TEs/tRNAscan_gff_generator.c -o tRNAscan_gff_generator

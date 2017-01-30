@@ -184,7 +184,7 @@ void findSNPs (fasta *firFasta, FILE *inFile, FILE *outFile) {
             }
         }
 //Print it
-        fprintf (outFile, ">%s-1\n%s\n", title.str, curFasta->sequence.str);
+        fprintf (outFile, ">%s_1\n%s\n", title.str, curFasta->sequence.str);
 //Find the corresponding second entry
         label.str[label.len - 2] = '2';
         while (strcmp (curFasta->title.str, label.str) != 0) {
@@ -195,7 +195,7 @@ void findSNPs (fasta *firFasta, FILE *inFile, FILE *outFile) {
             }
         }
 //Print it
-        fprintf (outFile, ">%s-2\n%s\n", title.str, curFasta->sequence.str);
+        fprintf (outFile, ">%s_2\n%s\n", title.str, curFasta->sequence.str);
 //Drop the current SNP data
         free (label.str);
         label.len = 0;

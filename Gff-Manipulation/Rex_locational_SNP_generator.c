@@ -18,15 +18,6 @@ typedef struct fasta {
     struct fasta *next;
 } fasta;
 
-//SNP entry
-typedef struct SNP {
-    string location;
-    int start;
-    int end;
-    char strand;
-    string title;
-} SNP;
-
 //List of functions, alphabetically
 void createFile (FILE **file, char *fName, char perm);
 void createOutputFile (FILE **outFile, char *inName);
@@ -34,12 +25,11 @@ void findSNPs (fasta *firFasta, FILE *inFile, FILE *outFile);
 void freeFasta (fasta *entry);
 void freeFastaList (fasta *firFasta);
 void initializeFasta (fasta *newFasta);
-void initializeSNP (SNP *newSNP);
 void initializeString (string *newString);
 void loadFastaList (fasta *firFasta, FILE *inFile);
-void loadSNPList (SNP *firSNP, FILE *inFile);
-void printfSNPEntries (fasta *entry, FILE *outFile);
+void printSNPEntries (fasta *entry, FILE *outFile);
 void readValueToString (string *string, char in);
+void reinitializeString (string *oldString);
 
 //main ()
 int main (int argC, char *argV[]) {
@@ -130,6 +120,52 @@ void createOutputFile (FILE **outFile, char *inName) {
     return;
 }
 
+//Finds the fasta sequences identified by SNP coordinates
+void findSNPs (fasta *firFasta, FILE *inFile, FILE *outFile) {
+//Local variables
+    int count = 0, start, end;
+    string title, label;
+    char strand, in;
+    fasta *curFasta = NULL;
+    initializeString (&location);
+    initializeString (&title);
+    initializeString (&label);
+//Loop to cover SNP list
+    while (0) {
+//Stop conditions
+        if (((ferror (inFile)) || (feof (inFile)))) {
+            break;
+        }
+//Reset the Fasta
+        curFasta = firFasta;
+//Load the current SNP match from the BLAST file
+        in = fgetc (inFile);
+        while (in != '\t') {
+            readValueToString (title, in);
+            in = fgetc (inFile);
+        }
+        fscanf (inFile, "%d%d%c", &start, &end, &strand);
+//Burn the rest of the BLAST line
+
+//Find the corresponding first entry
+
+//Print it
+
+//Find the corresponding second entry
+
+//Print it
+
+//Drop the current SNP data
+
+//A counter so the user has some idea of how long it will take
+        if (++count % 1000 == 0) {
+            printf ("%d entries written...\n", count);
+        }
+    }
+    printf ("%d SNPs written.", count);
+    return;
+}
+
 //Free a single fasta entry
 void freeFasta (fasta *entry) {
     free (entry->title.str);
@@ -151,28 +187,11 @@ void freeFastaList (fasta *firFasta) {
     return;
 }
 
-//Free a SNP DLL
-void freeSNP (SNP *entry) {
-    free (entry->scaffold.str);
-    free (entry->type.str);
-    free (entry->notes.str);
-    free (entry);
-    return;
-}
-
 //Sets minimum values to a fasta entry
 void initializeFasta (fasta *newFasta) {
     initializeString (&newFasta->title);
     initializeString (&newFasta->sequence);
     newFasta->next = NULL;
-    return;
-}
-
-//Sets minimum values to a SNP entry
-void initializeSNP (SNP *newSNP) {
-    initializeString (&newSNP->scaffold);
-    initializeString (&newSNP->type);
-    initializeString (&newSNP->notes);
     return;
 }
 
@@ -235,169 +254,6 @@ void loadFastaList (fasta *firFasta, FILE *inFile) {
     return;
 }
 
-//Read SNP data from file into a DLL
-void loadSNPList (SNP *firSNP, FILE *inFile) {
-//Local variables
-    int count = 0;
-    char in;
-    SNP *curSNP = firSNP, *prevSNP = NULL;
-//Skip the SNP header line
-    in = fgetc (inFile);
-    while (in != '\n') {
-        in = fgetc (inFile);
-    }
-//Loop for the whole file
-    while (1) {
-        in = fgetc (inFile);
-//Stop conditions
-        if (((ferror (inFile)) || (feof (inFile)))) {
-            break;
-        }
-//# is a comment line and can be skipped
-        if (in == '#') {
-            while (in != '\n') {
-                in = fgetc (inFile);
-            }
-            count--;
-        } else {
-//Read the scaffold
-            while (in != '\t') {
-                readValueToString (&curSNP->scaffold, in);
-                in = fgetc (inFile);
-            }
-            in = fgetc (inFile);
-//Skip to type
-            while (in != '\t') {
-                in = fgetc (inFile);
-            }
-            in = fgetc (inFile);
-//Read the type
-            while (in != '\t') {
-                readValueToString (&curSNP->type, in);
-                in = fgetc (inFile);
-            }
-//Only copy gene or transcript entries
-            if ((strcmp (curSNP->type.str, "gene") == 0) || (strcmp (curSNP->type.str, "transcript") == 0)) { //Removed to cover all entries */
-//Read the start, end, and strand
-                fscanf (inFile, "%d%d%*c%*c%*c%c%*c%*c%*c", &curSNP->start, &curSNP->end, &curSNP->strand);
-                in = fgetc (inFile);
-//Scan the comments for "Notes="
-                while (in != '\n') {
-                    in = fgetc (inFile);
-//Check a letter at a time
-                    if (in == 'N') {
-                        in = fgetc (inFile);
-                        if (in == 'o') {
-                            in = fgetc (inFile);
-                            if (in =='t') {
-                                in = fgetc (inFile);
-                                if (in == 'e') {
-                                    in = fgetc (inFile);
-                                    if (in == '=') {
-                                        in = fgetc (inFile);
-                                        while (in != ';') {
-                                            readValueToString (&curSNP->notes, in);
-                                            in = fgetc (inFile);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-//Skip to the next comment if it's not a note
-                    while ((in != ';') && (in != '\n')) {
-                        in = fgetc (inFile);
-                    }
-                }
-//Create a new entry on the SNP DLL
-                curSNP->next = malloc (sizeof (*curSNP));
-                initializeSNP (curSNP->next);
-                prevSNP = curSNP;
-                curSNP = curSNP->next;
-//If it's not a gene, skip it and empty the scaffold entry
-            } else {
-                while (in != '\n') {
-                    in = fgetc (inFile);
-                }
-                initializeString (&curSNP->scaffold);
-                initializeString (&curSNP->type);
-            }
-//In either case empty type
-        }
-//A counter so the user has some idea of how long it will take
-        if ((++count % 50000 == 0) && (count != 0)) {
-            printf ("%d entries loaded...\n", count);
-        }
-    }
-    prevSNP->next = NULL;
-    freeSNP (curSNP);
-    printf ("%d entries loaded.", count);
-    return;
-}
-
-//Prints the fasta sequences identified by SNP coordinates
-void printfSNPEntries (SNP *curSNP, fasta *firFasta, FILE *outFile) {
-//Local variables
-    int count = 0, i;
-    SNP *prevSNP = NULL;
-    fasta *curFasta = NULL;
-    string sequence;
-    initializeString (&sequence);
-//Loop to cover SNP list
-    while (curSNP != NULL) {
-//Start at the first fasta entry
-        curFasta = firFasta;
-//Find matching scaffold
-        while (strcmp (curSNP->scaffold.str, curFasta->title.str) != 0) {
-            curFasta = curFasta->next;
-//In case an entry is missing
-            if (curFasta == NULL) {
-                printf ("\"%s\" not found in fasta file!\n", curSNP->scaffold.str);
-                exit (3);
-            }
-        }
-//Start a loop for clustered genes
-        while (1) {
-//Print fasta title
-            fprintf (outFile, ">%s_%s_%d-%d_%c\t%s\n", curSNP->scaffold.str, curSNP->type.str, curSNP->start, curSNP->end, curSNP->strand, curSNP->notes.str);
-//Copy sequence
-            initializeString (&sequence);
-            for (i = curSNP->start; i < curSNP->end; i++) {
-                readValueToString (&sequence, curFasta->sequence.str[i]);
-            }
-//Invert if needed
-            if (curSNP->strand == '-') {
-                invertSequence (&sequence);
-            }
-//Print the sequence
-            for (i = 1; i < sequence.len; i++) {
-                fprintf (outFile, "%c", sequence.str[(i - 1)]);
-                if (i % 80 == 0) {
-                    fprintf (outFile, "\n");
-                }
-            }
-            fprintf (outFile, "\n");
-            free (sequence.str);
-//Move to next entry, free last one
-            prevSNP = curSNP;
-            curSNP = curSNP->next;
-//If it's the end of the cluster or the SNP list
-            if ((curSNP == NULL) || (strcmp (prevSNP->scaffold.str, curSNP->scaffold.str) != 0)) {
-                freeSNP (prevSNP);
-                break;
-            } else {
-                freeSNP (prevSNP);
-            }            
-        }
-//A counter so the user has some idea of how long it will take
-        if (++count % 1000 == 0) {
-            printf ("%d entries written...\n", count);
-        }
-    }
-    printf ("%d entries written.", count);
-    return;
-}
-
 //Adds a character to a string, adjsuting size as needed
 void readValueToString (string *string, char in) {
     string->str = realloc (string->str, ++(string->len));
@@ -405,3 +261,8 @@ void readValueToString (string *string, char in) {
     string->str[(string->len - 1)] = '\0';
     return;
 }
+
+void reinitializeString (string *oldString) {
+
+    return;
+)

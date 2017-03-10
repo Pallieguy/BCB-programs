@@ -445,10 +445,10 @@ void invertSequence (fastaEntry *curFasta) {
             invSequence.str[j] = 'G';
         } else if (curFasta->sequence.str[i] == 'G') {
             invSequence.str[j] = 'C';
-        } else if (curFasta->sequence.str[i] == 'N') {
-            invSequence.str[j] = 'N';
         } else if (curFasta->sequence.str[i] == 'T') {
             invSequence.str[j] = 'A';
+        } else {
+            invSequence.str[j] = 'N';
         }
         j--;
         i++;
@@ -558,7 +558,18 @@ void printFastaEntry (fastaEntry *fasta, FILE *outFile) {
     fprintf (outFile, ">%s\n", fasta->title.str);
 //Print the sequence
     while (location < (fasta->sequence.len - 1)) {
-        fprintf (outFile, "%c", fasta->sequence.str[location++]);
+        if (fasta->sequence.str[location] == 'A') {
+            fprintf (outFile, "A");
+        } else if (fasta->sequence.str[location] == 'T') {
+            fprintf (outFile, "T");
+        } else if (fasta->sequence.str[location] == 'G') {
+            fprintf (outFile, "G");
+        } else if (fasta->sequence.str[location] == 'C') {
+            fprintf (outFile, "C");
+        } else {
+            fprintf (outFile, "N");
+        }
+        location++;
 //Add a carriage return every 80 characters
         if (location % 80 == 0) {
             fprintf (outFile, "\n");

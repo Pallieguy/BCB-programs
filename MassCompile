@@ -46,6 +46,7 @@ cc Misc/Title_uniqueness_verifier.c -o Title_uniqueness_verifier
 cc Old/Edge_align_filter.c -o Edge_align_filter
 cc Old/Novoalign_parser_PE.c -o Novoalign_parser_PE
 cc Old/Novoalign_parser_SE.c -o Novoalign_parser_SE
+cc One-offs/K_finder.c -o K_finder
 cc Protein-Protein-Interaction/PPI_AA_frequency_compiler.c -o PPI_AA_frequency_compiler
 cc Protein-Protein-Interaction/PPI_fasta_web_querier.c -o PPI_fasta_web_querier -lcurl
 cc Pseudochromosomes/Pseudochromosome_assembler.c -o Pseudochromosome_assembler

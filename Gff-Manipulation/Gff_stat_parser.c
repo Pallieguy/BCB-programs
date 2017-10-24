@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
     FILE *inFile = NULL;
     string source, type;
     char in;
-    int maker_count = 0, augustus_count = 0, snap_count = 0, genemark_count = 0, blastn_count = 0, blastx_count = 0, est2genome_count = 0, protein2genome_count = 0, repeatmasker_count = 0, repeatrunner_count = 0, LTRharvest_count = 0, LTRfinder_count = 0, TRF_count = 0, tRNAscan_count = 0, gene_count = 0, TE_count = 0, count = 0;
+    int maker_count = 0, augustus_count = 0, snap_count = 0, genemark_count = 0, blastn_count = 0, blastx_count = 0, est2genome_count = 0, protein2genome_count = 0, repeatmasker_count = 0, repeatrunner_count = 0, LTRharvest_count = 0, LTR_Finder_count = 0, TRF_count = 0, tRNAscan_count = 0, gene_count = 0, TE_count = 0, count = 0, tblastx_count = 0, cdna2genome_count = 0;
 //File creation and checks
     printf ("Opening files...\n");
     createFile (&inFile, argv[1], 'r');
@@ -80,18 +80,22 @@ int main (int argc, char *argv[]) {
             blastn_count++;
         } else if ((strcmp (source.str, "blastx") == 0) && (strcmp (type.str, "protein_match") == 0)) {
             blastx_count++;
+        } else if ((strcmp (source.str, "tblastx") == 0) && (strcmp (type.str, "translated_nucleotide_match") == 0)) {
+            tblastx_count++;
         } else if ((strcmp (source.str, "est2genome") == 0) && (strcmp (type.str, "expressed_sequence_match") == 0)) {
             est2genome_count++;
         } else if ((strcmp (source.str, "protein2genome") == 0) && (strcmp (type.str, "protein_match") == 0)) {
             protein2genome_count++;
+        } else if ((strcmp (source.str, "cdna2genome") == 0) && (strcmp (type.str, "expressed_sequence_match") == 0)) {
+            cdna2genome_count++;
         } else if ((strcmp (source.str, "repeatmasker") == 0) && (strcmp (type.str, "match") == 0)) {
             repeatmasker_count++;
         } else if ((strcmp (source.str, "repeatrunner") == 0) && (strcmp (type.str, "protein_match") == 0)) {
              repeatrunner_count++;
         } else if ((strcmp (source.str, "LTRharvest") == 0) && (strcmp (type.str, "repeat_region") == 0)) {
             LTRharvest_count++;
-        } else if ((strcmp (source.str, "LTRfinder") == 0) && (strcmp (type.str, "repeat_region") == 0)) {
-            LTRfinder_count++;
+        } else if ((strcmp (source.str, "LTR_Finder") == 0) && (strcmp (type.str, "repeat_region") == 0)) {
+            LTR_Finder_count++;
         } else if ((strcmp (source.str, "TRF") == 0) && (strcmp (type.str, "repeat_region") == 0)) {
             TRF_count++;
         } else if ((strcmp (source.str, "tRNAscan") == 0) && (strcmp (type.str, "tRNA") == 0)) {
@@ -109,7 +113,7 @@ int main (int argc, char *argv[]) {
         reinitializeString (&type);
     }
 //Display the stats
-    printf ("%d entries process.  All stats Parsed.\n\t###MAKER Matches###\nMAKER Consensus Genes:\t%d\nAugustus Matches:\t%d\nsnap Matches:\t\t%d\nGenemark Matches:\t%d\nBLASTn Matches\t\t%d\nBLASTx Matches\t\t%d\nest2genome Matches:\t%d\nprotein2genome Matches:\t%d\nRepeatMasker Matches:\t%d\nRepeatrunner Matches:\t%d\n\t###Other Annotations###\nLTRharvest Matches:\t%d\nLTRfinder Matches:\t%d\nTRF Matches:\t\t%d\ntRNAscan Matches:\t%d\n\t###Generic Matches###\nGenes:\t\t\t%d\nTransposable Elements:\t%d\n", count, maker_count, augustus_count, snap_count, genemark_count, blastn_count, blastx_count, est2genome_count, protein2genome_count, repeatmasker_count, repeatrunner_count, LTRharvest_count, LTRfinder_count, TRF_count, tRNAscan_count, gene_count, TE_count);
+    printf ("%d entries process.  All stats Parsed.\n\t###MAKER Matches###\nMAKER Consensus Genes:\t%d\nAugustus Matches:\t%d\nsnap Matches:\t\t%d\nGenemark Matches:\t%d\nBLASTn Matches:\t\t%d\nBLASTx Matches:\t\t%d\ntBLASTx Matches:\t%d\nest2genome Matches:\t%d\nprotein2genome Matches:\t%d\ncdna2genome Matches:\t%d\nRepeatMasker Matches:\t%d\nRepeatrunner Matches:\t%d\n\t###Other Annotations###\nLTRharvest Matches:\t%d\nLTR_Finder Matches:\t%d\nTRF Matches:\t\t%d\ntRNAscan Matches:\t%d\n\t###Generic Matches###\nGenes:\t\t\t%d\nTransposable Elements:\t%d\n", count, maker_count, augustus_count, snap_count, genemark_count, blastn_count, blastx_count, tblastx_count, est2genome_count, protein2genome_count, cdna2genome_count, repeatmasker_count, repeatrunner_count, LTRharvest_count, LTR_Finder_count, TRF_count, tRNAscan_count, gene_count, TE_count);
 //Close everything and free memory
     free (source.str);
     free (type.str);

@@ -1,4 +1,4 @@
-/* This program parses entries in a fasta to generate artifical mate pair reads.  It takes a fasta and a number as input. */
+/* This program parses entries in a fasta to generate interleaved artifical mate pair reads.  It takes a fastq and a number as input. */
 
 //Standard includes, alphabetically
 #include <stdio.h>
@@ -11,25 +11,22 @@ typedef struct string {
     int len;
 } string;
 
-//Fastq entry components collected into a single struct
-typedef struct fastqEntry {
+//Fasta entry components collected into a single struct
+typedef struct fastaEntry {
     string *title;
     string *seq;
-    string *qual;
-    struct fastqEntry *next;
-} fastqEntry;
+    struct fastaEntry *next;
+} fastaEntry;
 
 //Functions, in alphabetical order
-void copyString (string *dest, string *src);
 void createFile (FILE **file, char *fName, char perm);
 void createOutputFile (FILE **outFile, char *inName, char *coverage);
-void freeFastqEntry (fastqEntry *entry);
-void initializeFastqEntry (fastqEntry *newFastq);
+void freeFastaEntry (fastaEntry *entry);
+void initializeFastaEntry (fastaEntry *newFasta);
 void initializeString (string *newString);
-void invertSequence (string *source);
 void parseRead (FILE *inFile, FILE *outFile, int distance);
 void readValueToString (string *string, char in);
-void reinitializeString (string *string);
+void reinitializeFastaEntry (fastaEntry *fasta);
 
 //main ()
 int main (int argC, char *argV[]) {
@@ -51,31 +48,11 @@ int main (int argC, char *argV[]) {
 //Copy the entries
     printf ("Files found and created.  Compiling entries...\n");
     parseRead (inFile, outFile, distance);
-//A counter so the user has some idea of how long it will take
-//        if (++count % 10000 == 0) {
-//            printf ("%d reads parsed...\n", count);
-//        }
 //Close everything and free memory
     printf ("  Closing files...\n");
     fclose (inFile);
     fclose (outFile);
     return 0;
-}
-
-//Copy a string's content to another string, replacing any content that may have been there before.
-void copyString (string *dest, string *src) {
-//Local variables
-    int i;
-    free (dest->str);
-//Change size
-    dest->len = src->len;
-//realloc memory
-    dest->str = malloc (dest->len);
-//Copy values
-    for (i = 0; i < dest->len; i++) {
-        dest->str[i] = src->str[i];
-    }
-    return;
 }
 
 //Create and check a file opening
@@ -139,20 +116,18 @@ void createOutputFile (FILE **outFile, char *inName, char *distance) {
 }
 
 //Free a single fasta entry
-void freeFastqEntry (fastqEntry *entry) {
-    free (entry->title.str);
-    free (entry->seq.str);
-    free (entry->qual.str);
+void freeFastaEntry (fastaEntry *entry) {
+    free (entry->title->str);
+    free (entry->seq->str);
     free (entry);
     return;
 }
 
-//Sets minimum values to a fastq entry
-void initializeFastqEntry (fastqEntry *newFastq) {
-    initializeString (&newFastq->title);
-    initializeString (&newFastq->seq);
-    initializeString (&newFastq->qual);
-    newFastq->next = NULL;
+//Sets minimum values to a fasta entry
+void initializeFastaEntry (fastaEntry *newFasta) {
+    initializeString (newFasta->title);
+    initializeString (newFasta->seq);
+    newFasta->next = NULL;
     return;
 }
 
@@ -164,83 +139,66 @@ void initializeString (string *newString) {
     return;
 }
 
-//Inverts the order and nucleotide of a given sequence
-void invertSequence (string *sequence) {
-//Local variables
-    int i = 0, j = (sequence->len - 1);
-    string invSequence;
-    initializeString (&invSequence);
-//Allocate needed memory
-    invSequence.len = sequence->len;
-    invSequence.str = malloc (invSequence.len);
-//Set the null terminator
-    invSequence.str[j] = '\0';
-    j--;
-//Work backwards, inverting as we go
-    while (j >= 0) {
-        if (sequence->str[i] == 'A') {
-            invSequence.str[j] = 'T';
-        } else if (sequence->str[i] == 'C') {
-            invSequence.str[j] = 'G';
-        } else if (sequence->str[i] == 'G') {
-            invSequence.str[j] = 'C';
-        } else if (sequence->str[i] == 'N') {
-            invSequence.str[j] = 'N';
-        } else if (sequence->str[i] == 'T') {
-            invSequence.str[j] = 'A';
-        }
-        j--;
-        i++;
-    }
-//Replace the old sequence with the new one
-    copyString (sequence, &invSequence);
-    free (invSequence.str);
-    return;
-}
-
 //Goes one read at a time looking for AMPs to parse out of the read and writes them to the outfile
 void parseRead (FILE *inFile, FILE *outFile, int distance) {
 //Local variables
-    fastqEntry curRead, curAMP;
+    fastaEntry curRead;
     string forSeq, forQual, revSeq, revQual;
     int count = 0, i;
     char in;
 //Initialize as needed
-    initializeFastqEntry (&curRead);
-    initializeFastqEntry (&curAMP);
+    initializeFastaEntry (&curRead);
+    in = fgetc (inFile);
 //Loop the process
     while (1) {
-        in = fgetc (inFile)
+        in = fgetc (inFile);
         i = 0;
 //Stop conditions
         if (((ferror (inFile)) || (feof (inFile)))) {
             break;
         }
 //Load the read, title first
-        while (in != '\n') {
+        while ((in != '\n') || (in != ' ') || (in != '\t')) {
             readValueToString (curRead.title, in);
+            in = fgetc (inFile);
+        }
+//Skip extra info
+        while (in != '\n') {
             in = fgetc (inFile);
         }
 //Sequence second
         in = fgetc (inFile);
-        while (in != '\n') {
-            readValueToString (curRead.seq, in);
+        while (in != '>') {
+//Stop conditions
+            if (((ferror (inFile)) || (feof (inFile)))) {
+                break;
+            } else if (in != '\n') {
+                readValueToString (curRead.seq, in);
+            }
             in = fgetc (inFile);
         }
 //Check that it's long enough
-        if (curRead.seq.len > distance) {
-//Skip the '+'
-            in = fgetc (inFile);
-            in = fgetc (inFile);
-            in = fgetc (inFile);
-//Grab the quality
-            while (in != '\n') {
-                readValueToString (curRead.qual, in);
-                in = fgetc (inFile);
-            }
+        if (curRead.seq->len > (distance + 200)) {
+//Loop variable
+            int j;
 //Parse out AMPs
-            while ((i + distance) < curRead.seq.len) {
-                
+            while ((i + 200 + distance) < curRead.seq->len) {
+//Print AMP first name
+                fprintf (outFile, "%s_%iR1\n", curRead.title->str, count);
+//First MP is reverse orientation
+                j = 99;
+                while (j-- >= 0) {
+                    fprintf (outFile, "%c", curRead.seq->str[(j + i)]);
+                }
+//Print AMP second name
+                fprintf (outFile, "\n%s_%iR2\n", curRead.title->str, count);
+//Second MP is forward orientation
+                j = 0;
+                while (j++ < 100) {
+                    fprintf (outFile, "%c", curRead.seq->str[(j + i + distance)]);
+                }
+//Move the frame down the read
+                i += 80;
             }
 //Otherwise skip to the next entry
         } else {
@@ -258,12 +216,10 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
             printf ("%d reads parsed...\n", count);
         }
 //Clear the read to start the next one
-        reinitializeFastqEntryString (&curRead);
-        reinitializeFastqEntryString (&curAMP);
+        reinitializeFastaEntry (&curRead);
     }
 //Free everything
-    freeFastqEntry (&curRead);
-    freeFastqEntry (&curAMP);
+    freeFastaEntry (&curRead);
 return;
 }
 
@@ -275,16 +231,13 @@ void readValueToString (string *string, char in) {
     return;
 }
 
-//Reset the strings of a fastqEntry to empty values so it can be reused
-void reinitializeFastqEntry (fastqEntry *fastq) {
-    fastq->title.len = 1;
-    fastq->title.str = realloc (1);
-    fastq->title.str[0] = '\0';
-    fastq->seq.len = 1;
-    fastq->seq.str = realloc (1);
-    fastq->seqstr[0] = '\0';
-    fastq->qual.len = 1;
-    fastq->qual.str = realloc (1);
-    fastq->qual.str[0] = '\0';
+//Reset the strings of a fastaEntry to empty values so it can be reused
+void reinitializeFastaEntry (fastaEntry *fasta) {
+    fasta->title->len = 1;
+    fasta->title->str = realloc (fasta->title->str, 1);
+    fasta->title->str[0] = '\0';
+    fasta->seq->len = 1;
+    fasta->seq->str = realloc (fasta->seq->str, 1);
+    fasta->seq->str[0] = '\0';
     return;
 }

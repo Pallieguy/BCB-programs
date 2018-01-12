@@ -135,7 +135,7 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
 //Local variables
     fastaEntry curRead;
     string forSeq, forQual, revSeq, revQual;
-    int count = 0, i;
+    int count = 0, i, readCount = 0;
     char in;
 //Initialize as needed
     initializeFastaEntry (&curRead);
@@ -175,20 +175,21 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
 //Parse out AMPs
             while ((i + 200 + distance) < curRead.seq.len) {
 //Print AMP first name
-                fprintf (outFile, "%s_%iR1\n", curRead.title.str, count);
+                fprintf (outFile, "%s_%iR1\n", curRead.title.str, ++readCount);
 //First MP is reverse orientation
                 j = 99;
                 while (j-- >= 0) {
                     fprintf (outFile, "%c", curRead.seq.str[(j + i)]);
                 }
 //Print AMP second name
-                fprintf (outFile, "\n%s_%iR2\n", curRead.title.str, count);
+                fprintf (outFile, "\n%s_%iR2\n", curRead.title.str, readCount);
 //Second MP is forward orientation
                 j = 0;
                 while (j++ < 100) {
                     fprintf (outFile, "%c", curRead.seq.str[(j + i + distance)]);
                 }
 //Move the frame down the read
+                fprintf (outFile, "\n");
                 i += 80;
             }
 //Otherwise skip to the next entry
@@ -212,7 +213,7 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
 //Free everything
     free (curRead.title.str);
     free (curRead.seq.str);
-    printf ("%d reads parsed.", count);
+    printf ("%d reads parsed into %d AMPs.", count, readCount);
 return;
 }
 

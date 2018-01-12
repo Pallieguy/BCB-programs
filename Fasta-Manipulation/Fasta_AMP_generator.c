@@ -13,15 +13,14 @@ typedef struct string {
 
 //Fasta entry components collected into a single struct
 typedef struct fastaEntry {
-    string *title;
-    string *seq;
+    string title;
+    string seq;
     struct fastaEntry *next;
 } fastaEntry;
 
 //Functions, in alphabetical order
 void createFile (FILE **file, char *fName, char perm);
 void createOutputFile (FILE **outFile, char *inName, char *coverage);
-void freeFastaEntry (fastaEntry *entry);
 void initializeFastaEntry (fastaEntry *newFasta);
 void initializeString (string *newString);
 void parseRead (FILE *inFile, FILE *outFile, int distance);
@@ -115,18 +114,10 @@ void createOutputFile (FILE **outFile, char *inName, char *distance) {
     return;
 }
 
-//Free a single fasta entry
-void freeFastaEntry (fastaEntry *entry) {
-    free (entry->title->str);
-    free (entry->seq->str);
-    free (entry);
-    return;
-}
-
 //Sets minimum values to a fasta entry
 void initializeFastaEntry (fastaEntry *newFasta) {
-    initializeString (newFasta->title);
-    initializeString (newFasta->seq);
+    initializeString (&(*newFasta).title);
+    initializeString (&(*newFasta).seq);
     newFasta->next = NULL;
     return;
 }
@@ -158,8 +149,8 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
             break;
         }
 //Load the read, title first
-        while ((in != '\n') || (in != ' ') || (in != '\t')) {
-            readValueToString (curRead.title, in);
+        while ((in != '\n') && (in != ' ') && (in != '\t')) {
+            readValueToString (&curRead.title, in);
             in = fgetc (inFile);
         }
 //Skip extra info
@@ -173,29 +164,29 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
             if (((ferror (inFile)) || (feof (inFile)))) {
                 break;
             } else if (in != '\n') {
-                readValueToString (curRead.seq, in);
+                readValueToString (&curRead.seq, in);
             }
             in = fgetc (inFile);
         }
 //Check that it's long enough
-        if (curRead.seq->len > (distance + 200)) {
+        if (curRead.seq.len > (distance + 200)) {
 //Loop variable
             int j;
 //Parse out AMPs
-            while ((i + 200 + distance) < curRead.seq->len) {
+            while ((i + 200 + distance) < curRead.seq.len) {
 //Print AMP first name
-                fprintf (outFile, "%s_%iR1\n", curRead.title->str, count);
+                fprintf (outFile, "%s_%iR1\n", curRead.title.str, count);
 //First MP is reverse orientation
                 j = 99;
                 while (j-- >= 0) {
-                    fprintf (outFile, "%c", curRead.seq->str[(j + i)]);
+                    fprintf (outFile, "%c", curRead.seq.str[(j + i)]);
                 }
 //Print AMP second name
-                fprintf (outFile, "\n%s_%iR2\n", curRead.title->str, count);
+                fprintf (outFile, "\n%s_%iR2\n", curRead.title.str, count);
 //Second MP is forward orientation
                 j = 0;
                 while (j++ < 100) {
-                    fprintf (outFile, "%c", curRead.seq->str[(j + i + distance)]);
+                    fprintf (outFile, "%c", curRead.seq.str[(j + i + distance)]);
                 }
 //Move the frame down the read
                 i += 80;
@@ -212,14 +203,16 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
             }
         }
 //A counter so the user has some idea of how long it will take
-        if (++count % 1000 == 0) {
+        if (++count % 100000 == 0) {
             printf ("%d reads parsed...\n", count);
         }
 //Clear the read to start the next one
         reinitializeFastaEntry (&curRead);
     }
 //Free everything
-    freeFastaEntry (&curRead);
+    free (curRead.title.str);
+    free (curRead.seq.str);
+    printf ("%d reads parsed.", count);
 return;
 }
 
@@ -233,11 +226,11 @@ void readValueToString (string *string, char in) {
 
 //Reset the strings of a fastaEntry to empty values so it can be reused
 void reinitializeFastaEntry (fastaEntry *fasta) {
-    fasta->title->len = 1;
-    fasta->title->str = realloc (fasta->title->str, 1);
-    fasta->title->str[0] = '\0';
-    fasta->seq->len = 1;
-    fasta->seq->str = realloc (fasta->seq->str, 1);
-    fasta->seq->str[0] = '\0';
+    fasta->title.len = 1;
+    fasta->title.str = realloc (fasta->title.str, 1);
+    fasta->title.str[0] = '\0';
+    fasta->seq.len = 1;
+    fasta->seq.str = realloc (fasta->seq.str, 1);
+    fasta->seq.str[0] = '\0';
     return;
 }

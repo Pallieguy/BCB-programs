@@ -1,4 +1,4 @@
-/* This program parses entries in a fasta to generate interleaved artifical mate pair reads.  It takes a fastq and a number as input. */
+/* This program parses entries in a fasta to generate interleaved artifical 100bp mate pair reads.  It takes a fastq and a number as input. */
 
 //Standard includes, alphabetically
 #include <stdio.h>
@@ -56,13 +56,7 @@ int main (int argC, char *argV[]) {
 
 //Create and check a file opening
 void createFile (FILE **file, char *fName, char perm) {
-    if (perm == 'r') {
-        *file = fopen (fName, "r");
-    } else if (perm == 'w') {
-        *file = fopen (fName, "w");
-    } else if (perm == 'a') {
-        *file = fopen (fName, "a");
-    }
+    *file = fopen (fName, &perm);
 //Check that fopen worked
     if (*file == NULL) {
         printf ("Can't access %s\n", fName);
@@ -100,7 +94,8 @@ void createOutputFile (FILE **outFile, char *inName, char *distance) {
     }
     fileName[j] = '\0';
 //Allow for the added text EDIT THIS AT COPY
-    outTitle = malloc (strlen (distance) + j + 27);
+    i = strlen (distance);
+    outTitle = malloc (i + j + 27);
     outTitle[0] = '\0';
     strcat (outTitle, "Interleaved_");
     strcat (outTitle, fileName);
@@ -169,39 +164,40 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
             in = fgetc (inFile);
         }
 //Check that it's long enough
-        if (curRead.seq.len > (distance + 200)) {
+        if (curRead.seq.len > (distance + 201)) {
 //Loop variable
             int j;
 //Parse out AMPs
-            while ((i + 200 + distance) < curRead.seq.len) {
+            while ((i + 201 + distance) < curRead.seq.len) {
 //Print AMP first name
-                fprintf (outFile, "%s_%iR1\n", curRead.title.str, ++readCount);
+                fprintf (outFile, "@%s_%iR1\n", curRead.title.str, ++readCount);
 //First MP is reverse orientation
-                j = 99;
-                while (j-- >= 0) {
+                j = 100;
+                while (j-- > 0) {
                     fprintf (outFile, "%c", curRead.seq.str[(j + i)]);
                 }
+//Print quality of PHRED64 29 (])
+                fprintf (outFile, "\n+\n");
+                for (j = 0; j < 100; j++) {
+                    fprintf (outFile, "]");
+                }
 //Print AMP second name
-                fprintf (outFile, "\n%s_%iR2\n", curRead.title.str, readCount);
+                fprintf (outFile, "\n@%s_%iR2\n", curRead.title.str, readCount);
 //Second MP is forward orientation
                 j = 0;
                 while (j++ < 100) {
-                    fprintf (outFile, "%c", curRead.seq.str[(j + i + distance)]);
+                    fprintf (outFile, "%c", curRead.seq.str[(j + i + 100 + distance)]);
+                }
+//Print quality of PHRED64 29 (])
+                fprintf (outFile, "\n+\n");
+                for (j = 0; j < 100; j++) {
+                    fprintf (outFile, "]");
                 }
 //Move the frame down the read
                 fprintf (outFile, "\n");
                 i += 80;
             }
 //Otherwise skip to the next entry
-        } else {
-            in = fgetc (inFile);
-            while (in != '\n') {
-                in = fgetc (inFile);
-            }
-            in = fgetc (inFile);
-            while (in != '\n') {
-                in = fgetc (inFile);
-            }
         }
 //A counter so the user has some idea of how long it will take
         if (++count % 100000 == 0) {

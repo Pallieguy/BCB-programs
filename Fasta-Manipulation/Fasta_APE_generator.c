@@ -166,10 +166,10 @@ void parseRead (FILE *inFile, FILE *outFile) {
             while (i++ < 120) {
                 fprintf (outFile, "%c", curRead.seq.str[(location + i)]);
             }
-//Print forward quality of PHRED64 32 (`)
+//Print forward quality of PHRED32 40 (H)
             fprintf (outFile, "\n+\n");
             for (i = 0; i < 120; i++) {
-                fprintf (outFile, "`");
+                fprintf (outFile, "H");
             }
 //Print reverse APE name
             fprintf (outFile, "\n@%s_%iR2\n", curRead.title.str, readCount);
@@ -178,10 +178,10 @@ void parseRead (FILE *inFile, FILE *outFile) {
             while (i-- > 81) {
                 fprintf (outFile, "%c", curRead.seq.str[(location + i)]);
             }
-//Print reverse quality of PHRED64 32 (`)
+//Print reverse quality of PHRED32 40 (H)
             fprintf (outFile, "\n+\n");
             for (i = 0; i < 120; i++) {
-                fprintf (outFile, "`");
+                fprintf (outFile, "H");
             }
 //Move the frame down the read
             fprintf (outFile, "\n");

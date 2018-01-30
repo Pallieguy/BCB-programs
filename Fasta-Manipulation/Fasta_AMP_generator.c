@@ -176,10 +176,10 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
                 while (j-- > 0) {
                     fprintf (outFile, "%c", curRead.seq.str[(j + i)]);
                 }
-//Print quality of PHRED64 29 (])
+//Print quality of PHRED32 29 (=)
                 fprintf (outFile, "\n+\n");
                 for (j = 0; j < 100; j++) {
-                    fprintf (outFile, "]");
+                    fprintf (outFile, "=");
                 }
 //Print AMP second name
                 fprintf (outFile, "\n@%s_%iR2\n", curRead.title.str, readCount);
@@ -188,10 +188,10 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
                 while (j++ < 100) {
                     fprintf (outFile, "%c", curRead.seq.str[(j + i + 100 + distance)]);
                 }
-//Print quality of PHRED64 29 (])
+//Print quality of PHRED32 29 (=)
                 fprintf (outFile, "\n+\n");
                 for (j = 0; j < 100; j++) {
-                    fprintf (outFile, "]");
+                    fprintf (outFile, "=");
                 }
 //Move the frame down the read
                 fprintf (outFile, "\n");

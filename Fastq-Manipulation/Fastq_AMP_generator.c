@@ -17,7 +17,7 @@ typedef struct fastqEntry {
     string seq;
     string qual;
     struct fastaEntry *next;
-} fastaEntry;
+} fastqEntry;
 
 //Functions, in alphabetical order
 void createFile (FILE **file, char *fName, char perm);
@@ -221,7 +221,7 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
             }
 //Otherwise skip to the next entry
         } else {
-            while (in != '\n')
+            while (in != '\n') {
                 in = fgetc (inFile);
             }
             in = fgetc (inFile);
@@ -231,7 +231,7 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
             printf ("%d reads parsed...\n", count);
         }
 //Clear the read to start the next one
-        reinitializeFastaEntry (&curRead);
+        reinitializeFastqEntry (&curRead);
     }
 //Free everything
     free (curRead.title.str);

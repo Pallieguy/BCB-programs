@@ -211,6 +211,7 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
                     fprintf (outFile, "%c", curRead.seq.str[(j + i + 100 + distance)]);
                 }
 //Print quality
+                fprintf (outFile, "\n+\n");
                 j = 0;
                 while (j++ < 100) {
                     fprintf (outFile, "%c", curRead.qual.str[(j + i + 100 + distance)]);

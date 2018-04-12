@@ -105,8 +105,10 @@ void createOutputFile (FILE **outFile, char *inName, char *distance) {
     }
     fileName[j] = '\0';
 //Allow for the added text EDIT THIS AT COPY
-    outTitle = malloc (strlen (distance) + j + 15);
+    i = strlen (distance);
+    outTitle = malloc (i + j + 27);
     outTitle[0] = '\0';
+    strcat (outTitle, "Interleaved_");
     strcat (outTitle, fileName);
     strcat (outTitle, "_");
     strcat (outTitle, distance);
@@ -218,11 +220,15 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
                 }
 //Move the frame down the read
                 fprintf (outFile, "\n");
-                i += 120;
+                i += 100;
             }
 //Otherwise skip to the next entry
         } else {
             while (in != '\n') {
+//Stop conditions
+                if (((ferror (inFile)) || (feof (inFile)))) {
+                    break;
+                }
                 in = fgetc (inFile);
             }
             in = fgetc (inFile);

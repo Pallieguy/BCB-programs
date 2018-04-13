@@ -141,7 +141,7 @@ void initializeString (string *newString) {
 void parseRead (FILE *inFile, FILE *outFile, int distance) {
     fastqEntry curRead;
     string forSeq, forQual, revSeq, revQual;
-    int count = 0, i, readCount = 0;
+    int count = 0, i, j, readCount = 0;
     char in;
 //Initialize as needed
     initializeFastqEntry (&curRead);
@@ -149,11 +149,11 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
 //Loop the process
     while (1) {
         in = fgetc (inFile);
-        i = 0;
 //Stop conditions
         if (((ferror (inFile)) || (feof (inFile)))) {
             break;
         }
+        i = 0;
 //Load the read, title first
         while ((in != '\n') && (in != ' ') && (in != '\t')) {
             readValueToString (&curRead.title, in);
@@ -188,21 +188,19 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
                 readValueToString (&curRead.qual, in);
                 in = fgetc (inFile);
             }
-//Loop variable
-            int j;
 //Parse out AMPs
             while ((i + 201 + distance) < curRead.seq.len) {
 //Print AMP first name
                 fprintf (outFile, "@%s_%iR1\n", curRead.title.str, ++readCount);
 //First MP is reverse orientation
-                j = 100;
-                while (j-- > 0) {
+                j = 99;
+                while (j-- >= 0) {
                     fprintf (outFile, "%c", curRead.seq.str[(j + i)]);
                 }
 //Print quality
                 fprintf (outFile, "\n+\n");
-                j = 100;
-                while (j-- > 0) {
+                j = 99;
+                while (j-- >= 0) {
                     fprintf (outFile, "%c", curRead.qual.str[(j + i)]);
                 }
 //Print AMP second name
@@ -224,6 +222,7 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
             }
 //Otherwise skip to the next entry
         } else {
+            in = fgetc (inFile);
             while (in != '\n') {
 //Stop conditions
                 if (((ferror (inFile)) || (feof (inFile)))) {
@@ -231,14 +230,14 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
                 }
                 in = fgetc (inFile);
             }
-            in = fgetc (inFile);
         }
 //A counter so the user has some idea of how long it will take
         if (++count % 100000 == 0) {
             printf ("%d reads parsed...\n", count);
         }
-//Clear the read to start the next one
+//Clear the read to start the next one (skip the @)
         reinitializeFastqEntry (&curRead);
+        in = fgetc (inFile);
     }
 //Free everything
     free (curRead.title.str);

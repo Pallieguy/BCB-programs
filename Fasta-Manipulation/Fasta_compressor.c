@@ -45,6 +45,12 @@ int main (int argC, char *argV[]) {
             break;
         } 
         if (in == '>') {
+//Keep the fasta at a nice width
+            if (position++ == 80) {
+                fprintf (outFile, "\n");
+                position = 1;
+            }
+            fprintf (outFile, "-");
             while (in != '\n') {
                 in = fgetc (inFile);
             }
@@ -98,7 +104,7 @@ void createOutputFile (FILE **outFile, char *inName) {
         }
         i--;
     }
-/*//Remove the file extention.  EDIT THIS AT COPY
+//Remove the file extention.  EDIT THIS AT COPY
     while (j-- > 0) {
         if (inName[j] == '.') {
             inName[j] = '\0';
@@ -114,10 +120,10 @@ void createOutputFile (FILE **outFile, char *inName) {
     }
     fileName[j] = '\0';
 //Allow for the added text EDIT THIS AT COPY
-    outTitle = malloc (j + 12);
+    outTitle = malloc (j + 17);
     outTitle[0] = '\0';
-    strcat (outTitle, "Compressed_");
     strcat (outTitle, fileName);
+    strcat (outTitle, "_Single-Entry.fa");
     free (fileName);
 //Create it
     createFile (*(&outFile), outTitle, 'w');

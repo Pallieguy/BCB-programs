@@ -165,17 +165,16 @@ void parseRead (FILE *inFile, char *fileName, char dir, int length, int overlap,
         in = fgetc (inFile);
     }
     fclose (inFile);
+//Set the starting point
+        if (dir == 'f') {
+            location = 0;
+        } else {
+            location = seq.len - ((length - overlap) * xCount) - overlap - 1;
+        }
 //Loop the extraction process
     while (xCount > 0) {
 //Loop variables
         FILE *outFile = NULL;
-        location = 0;
-//Set the starting point
-        if (dir == 'f') {
-            location = length * xCount - 1;
-        } else {
-            location = seq.len - (length * xCount) - 1;
-        }
 //Create the suffix label
         sufStart = location;
         i = 0;
@@ -207,9 +206,10 @@ void parseRead (FILE *inFile, char *fileName, char dir, int length, int overlap,
                 fprintf (outFile, "\n");
             }
         }
-//Close the outfile
+//Update iterated variables
         xCount--;
         fclose (outFile);
+        location += (length - overlap);
 //A counter so the user has some idea of how long it will take
         if (xCount % 10 == 0) {
             printf ("%d reads remaining to be extracted...\n", xCount);

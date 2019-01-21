@@ -195,7 +195,7 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
                 }
 //Move the frame down the read
                 fprintf (outFile, "\n");
-                i += 80;
+                i += 120;
             }
 //Otherwise skip to the next entry
         }

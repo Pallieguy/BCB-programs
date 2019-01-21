@@ -193,14 +193,14 @@ void parseRead (FILE *inFile, FILE *outFile, int distance) {
 //Print AMP first name
                 fprintf (outFile, "@%s_%iR1\n", curRead.title.str, ++readCount);
 //First MP is reverse orientation
-                j = 99;
-                while (j-- >= 0) {
+                j = 100;
+                while (j-- > 0) {
                     fprintf (outFile, "%c", curRead.seq.str[(j + i)]);
                 }
 //Print quality
                 fprintf (outFile, "\n+\n");
-                j = 99;
-                while (j-- >= 0) {
+                j = 100;
+                while (j-- > 0) {
                     fprintf (outFile, "%c", curRead.qual.str[(j + i)]);
                 }
 //Print AMP second name

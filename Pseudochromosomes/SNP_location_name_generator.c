@@ -43,7 +43,7 @@ int main (int argC, char *argV[]) {
     printf ("Opening files...\n");
     createFile (&bInFile, argV[1], 'r');
     createFile (&fInFile, argV[2], 'r');
-    createOutputFile (&outFile, argV[1]);
+    createOutputFile (&outFile, argV[2]);
 //Load fasta entries
     printf ("Loading fasta entries...\n");
     firFasta = malloc (sizeof (*firFasta));
@@ -63,13 +63,7 @@ int main (int argC, char *argV[]) {
 
 //Create and check a file opening
 void createFile (FILE **file, char *fName, char perm) {
-    if (perm == 'r') {
-        *file = fopen (fName, "r");
-    } else if (perm == 'w') {
-        *file = fopen (fName, "w");
-    } else if (perm == 'a') {
-        *file = fopen (fName, "a");
-    }
+    *file = fopen (fName, &perm);
 //Check that fopen worked
     if (*file == NULL) {
         printf ("Can't access %s\n", fName);
@@ -107,8 +101,9 @@ void createOutputFile (FILE **outFile, char *inName) {
     }
     fileName[j] = '\0';
 //Allow for the added text EDIT THIS AT COPY
-    outTitle = malloc (j + 7);
+    outTitle = malloc (j + 18);
     outTitle[0] = '\0';
+    strcat (outTitle, "locational_");
     strcat (outTitle, fileName);
     strcat (outTitle, ".fasta");
     free (fileName);
@@ -149,7 +144,7 @@ void findSNPs (fasta *firFasta, FILE *inFile, FILE *outFile) {
             readValueToString (&title, in);
             in = fgetc (inFile);
         }
-        readValueToString (&title, '-');
+        readValueToString (&title, '_');
 //End
         in = fgetc (inFile);
         while (in != '\t') {
@@ -159,8 +154,12 @@ void findSNPs (fasta *firFasta, FILE *inFile, FILE *outFile) {
         readValueToString (&title, '_');
 //Strand
         in = fgetc (inFile);
+        if (in == 'm') {
+            readValueToString (&title, '-');
+        } else {
+            readValueToString (&title, '+');
+        }
         while (in != '\t') {
-            readValueToString (&title, in);
             in = fgetc (inFile);
         }
 //Load the original SNP label
@@ -173,6 +172,19 @@ void findSNPs (fasta *firFasta, FILE *inFile, FILE *outFile) {
         while (in != '\n') {
             in = fgetc (inFile);
         }
+//UNCOMMENT IF 1 FORM SEARCH
+//Find the corresponding first entry
+        while (strcmp (curFasta->title.str, label.str) != 0) {
+            curFasta = curFasta->next;
+            if (curFasta == NULL) {
+                printf ("%s not found in fasta!\n", label.str);
+                exit (2);
+            }
+        }
+//Print it
+        fprintf (outFile, ">%s\n%s\n", title.str, curFasta->sequence.str);
+//END EDIT HERE */
+/*//UNCOMMENT IF 2 FORM SEARCH
 //Find the corresponding first entry
         readValueToString (&label, '-');
         readValueToString (&label, '1');
@@ -196,6 +208,7 @@ void findSNPs (fasta *firFasta, FILE *inFile, FILE *outFile) {
         }
 //Print it
         fprintf (outFile, ">%s_2\n%s\n", title.str, curFasta->sequence.str);
+//END EDIT HERE */
 //Drop the current SNP data
         free (label.str);
         label.len = 0;

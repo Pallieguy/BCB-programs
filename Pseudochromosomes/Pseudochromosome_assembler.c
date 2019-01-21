@@ -21,7 +21,7 @@ typedef struct blastEntry {
     int scafStart;
     int scafEnd;
     char scafStrand;
-    string score;
+    string evalue;
     struct blastEntry *next;
 } blastEntry;
 
@@ -134,7 +134,7 @@ fastaEntry assemblePseudochromosomes (fastaEntry *firFasta, blastEntry *firBlast
             }
         }
 //If there are multiple matches to a scaffold, find the best evalue
-        while (strcmp (curBlast->scaf.str, curBlast->next->scaf.str) == 0) {
+        while ((curBlast->next != NULL) && (strcmp (curBlast->scaf.str, curBlast->next->scaf.str) == 0)) {
             findBestBlast (curBlast, bestMatch);
 //Remove the lower match from the BLASTN list, since this only compares 2 matches at at time it will alwys be firBlast or firBlast->next
             if (bestMatch == firBlast) {
@@ -331,13 +331,13 @@ void findBestBlast (blastEntry *curBlast, blastEntry *bestMatch) {
         exit (4);
     }
 //If the first entry is a perfect match, but not the second
-    if ((curBlast->score.str[1] == '.') && (curBlast->next->score.str[1] != '.')) {
+    if ((curBlast->evalue.str[1] == '.') && (curBlast->next->evalue.str[1] != '.')) {
         bestMatch = curBlast;
 //If the first entry is not a perfect match, but the second is
-    } else if ((curBlast->score.str[1] != '.') && (curBlast->next->score.str[1] == '.')) {
+    } else if ((curBlast->evalue.str[1] != '.') && (curBlast->next->evalue.str[1] == '.')) {
         bestMatch = curBlast->next;
 //If both are perfect matches, look at which is a longer match
-    } else if ((curBlast->score.str[1] == '.') && (curBlast->next->score.str[1] == '.')) {
+    } else if ((curBlast->evalue.str[1] == '.') && (curBlast->next->evalue.str[1] == '.')) {
 //If the second is bigger, use it
         if ((curBlast->scafEnd - curBlast->scafStart) < (curBlast->next->scafEnd - curBlast->next->scafStart)) {
             bestMatch = curBlast->next;
@@ -346,10 +346,10 @@ void findBestBlast (blastEntry *curBlast, blastEntry *bestMatch) {
             bestMatch = curBlast;
         }
 //If neither is a perfect match
-    } else if ((curBlast->score.str[1] != '.') && (curBlast->next->score.str[1] != '.')){
-//Get the score values
-        sscanf (curBlast->score.str, "%d%*c%d", &e1a, &e1b);
-        sscanf (curBlast->next->score.str, "%d%*c%d", &e2a, &e2b);
+    } else if ((curBlast->evalue.str[1] != '.') && (curBlast->next->evalue.str[1] != '.')){
+//Get the evalue values
+        sscanf (curBlast->evalue.str, "%d%*c%d", &e1a, &e1b);
+        sscanf (curBlast->next->evalue.str, "%d%*c%d", &e2a, &e2b);
 //Look for the larger b value
         if (e1b < e2b) {
             bestMatch = curBlast->next;
@@ -373,7 +373,7 @@ void findBestBlast (blastEntry *curBlast, blastEntry *bestMatch) {
 void freeBlastEntry (blastEntry *oldEntry){
     free (oldEntry->chr.str);
     free (oldEntry->scaf.str);
-    free (oldEntry->score.str);
+    free (oldEntry->evalue.str);
     return;
 }
 
@@ -402,7 +402,7 @@ void initializeFastaEntry (fastaEntry *newFasta) {
 void initializeBlastEntry (blastEntry *newBlast) {
     initializeString (&(*newBlast).chr);
     initializeString (&(*newBlast).scaf);
-    initializeString (&(*newBlast).score);
+    initializeString (&(*newBlast).evalue);
     newBlast->next = NULL;
     return;
 }
@@ -464,29 +464,67 @@ void loadBlastList (blastEntry *curBlast, FILE *inFile) {
     char in;
     int count = 1;
 //Load the first entry manually
-    fscanf (inFile, "%s%d%d%*c%c%s%d%d%*c%c%s%*c", curBlast->chr.str, &curBlast->chrStart, &curBlast->chrEnd, &curBlast->chrStrand, curBlast->scaf.str, &curBlast->scafStart, &curBlast->scafEnd, &curBlast->scafStrand, curBlast->score.str);
-    curBlast->chr.len = strlen (curBlast->chr.str) + 1;
-    curBlast->scaf.len = strlen (curBlast->scaf.str) + 1;
+    in = fgetc (inFile);
+    while (in != '\t') {
+        readValueToString (&curBlast->chr, in);
+        in = fgetc (inFile);
+    }
+    fscanf (inFile, "%d%d", &curBlast->chrStart, &curBlast->chrEnd);
+    in = fgetc (inFile);
+    curBlast->chrStrand = fgetc (inFile);
+    in = fgetc (inFile);
+    in = fgetc (inFile);
+    while (in != '\t') {
+        readValueToString (&curBlast->scaf, in);
+        in = fgetc (inFile);
+    }
+    fscanf (inFile, "%d%d", &curBlast->scafStart, &curBlast->scafEnd);
+    in = fgetc (inFile);
+    curBlast->scafStrand = fgetc (inFile);
+    in = fgetc (inFile);
+    in = fgetc (inFile);
+    while (in != '\n') {
+        readValueToString (&curBlast->evalue, in);
+        in = fgetc (inFile);
+    }
 //Automate the rest
     while (1) {
         in = fgetc (inFile);
 //Break conditions
         if ((feof (inFile)) || (ferror (inFile))) {
             break;
-        } else {
-            fseek (inFile, -1, SEEK_CUR);
+        }
+        fseek (inFile, -1, SEEK_CUR);
 //Make a new entry and move the pointer along
-            curBlast->next = malloc (sizeof (*curBlast->next));
-            initializeBlastEntry (curBlast->next);
-            curBlast = curBlast->next;
+        curBlast->next = malloc (sizeof (*curBlast->next));
+        initializeBlastEntry (curBlast->next);
+        curBlast = curBlast->next;
 //Get values from the file (order is always the same);
-            fscanf (inFile, "%s%d%d%*c%c%s%d%d%*c%c%s%*c", curBlast->chr.str, &curBlast->chrStart, &curBlast->chrEnd, &curBlast->chrStrand, curBlast->scaf.str, &curBlast->scafStart, &curBlast->scafEnd, &curBlast->scafStrand, curBlast->score.str);
-//A counter so the user has some idea of how long it will take
-            curBlast->chr.len = strlen (curBlast->chr.str) + 1;
-            curBlast->scaf.len = strlen (curBlast->scaf.str) + 1;
-            if (++count % 1000 == 0){
-                printf ("%d BLASTN entries loaded...\n", count);
-            }
+        in = fgetc (inFile);
+        while (in != '\t') {
+            readValueToString (&curBlast->chr, in);
+            in = fgetc (inFile);
+        }
+        fscanf (inFile, "%d%d", &curBlast->chrStart, &curBlast->chrEnd);
+        in = fgetc (inFile);
+        curBlast->chrStrand = fgetc (inFile);
+        in = fgetc (inFile);
+        in = fgetc (inFile);
+        while (in != '\t') {
+            readValueToString (&curBlast->scaf, in);
+            in = fgetc (inFile);
+        }
+        fscanf (inFile, "%d%d", &curBlast->scafStart, &curBlast->scafEnd);
+        in = fgetc (inFile);
+        curBlast->scafStrand = fgetc (inFile);
+        in = fgetc (inFile);
+        in = fgetc (inFile);
+        while (in != '\n') {
+            readValueToString (&curBlast->evalue, in);
+            in = fgetc (inFile);
+        }
+        if (++count % 1000 == 0){
+            printf ("%d BLASTN entries loaded...\n", count);
         }
     }
     printf ("%d BLASTN entries loaded.  ", --count);
@@ -510,10 +548,8 @@ void loadFastaList (fastaEntry *curFasta, FILE *inFile) {
         in = fgetc (inFile);
     }
 //If there is more than jsut the title, ignore it
-    if ((in == '\t') || (in == ' ')) {
-        while (in != '\n') {
-            in = fgetc (inFile);
-        }
+    while (in != '\n') {
+        in = fgetc (inFile);
     }
 //Automate the rest
     while (1) {
@@ -522,7 +558,8 @@ void loadFastaList (fastaEntry *curFasta, FILE *inFile) {
         if (((ferror (inFile)) || (feof (inFile)))) {
             break;
 //If it's a new entry, create a new node and load the title
-        } else if (in == '>') {
+        }
+        if (in == '>') {
             curFasta->next = malloc (sizeof (*curFasta->next));
             initializeFastaEntry (curFasta->next);
             curFasta = curFasta->next;
@@ -533,10 +570,8 @@ void loadFastaList (fastaEntry *curFasta, FILE *inFile) {
                 in = fgetc (inFile);
             }
 //If there is more than jsut the title, ignore it
-            if ((in == '\t') || (in == ' ')) {
-                while (in != '\n') {
-                    in = fgetc (inFile);
-                }
+            while (in != '\n') {
+                in = fgetc (inFile);
             }
 //A counter so the user has some idea of how long it will take
             if (++count % 1000 == 0){
@@ -550,13 +585,13 @@ void loadFastaList (fastaEntry *curFasta, FILE *inFile) {
     return;
 }
 
-//Savea fasta to file
+//Save fasta to file
 void printFastaEntry (fastaEntry *fasta, FILE *outFile) {
 //Local variables
     int location = 0;
 //Print the title
     fprintf (outFile, ">%s\n", fasta->title.str);
-//Print the sequence
+//Print the sequence 
     while (location < (fasta->sequence.len - 1)) {
         if (fasta->sequence.str[location] == 'A') {
             fprintf (outFile, "A");

@@ -8,6 +8,7 @@ cc Fasta-Manipulation/Fasta_APE_generator.c -o Fasta_APE_generator
 cc Fasta-Manipulation/Fasta_file_combiner.c -o Fasta_file_combiner
 cc Fasta-Manipulation/Fasta_G2N.c -o Fasta_G2N
 cc Fasta-Manipulation/Fasta_gap_analyzer.c -o Fasta_gap_analyzer -lm
+cc Fasta-Manipulation/Fasta_gap_compressor.c -o Fasta_gap_compressor
 cc Fasta-Manipulation/Fasta_interleaver.c -o Fasta_interleaver
 cc Fasta-Manipulation/Fasta_read_extractor.c -o Fasta_read_extractor
 cc Fasta-Manipulation/Fasta_single_entry_compressor.c -o Fasta_single_entry_compressor
@@ -54,7 +55,7 @@ cc Protein-Protein-Interaction/PPI_AA_frequency_compiler.c -o PPI_AA_frequency_c
 cc Protein-Protein-Interaction/PPI_fasta_web_querier.c -o PPI_fasta_web_querier -lcurl
 cc Pseudochromosomes/Pseudochromosome_assembler.c -o Pseudochromosome_assembler
 cc Pseudochromosomes/Pseudochromosome_gff_updater.c -o Pseudochromosome_gff_updater
-cc Pseudochromosomes/Rex_locational_SNP_generator.c -o Rex_locational_SNP_generator
+cc Pseudochromosomes/SNP_curator.ca
 cc TEs/LTRharvest_gff_corrector.c -o LTRharvest_gff_corrector
 cc TEs/LTR_Finder_gff_generator.c -o LTR_Finder_gff_generator
 cc TEs/TRF_gff_generator.c -o TRF_gff_generator

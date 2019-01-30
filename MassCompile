@@ -9,6 +9,7 @@ cc Fasta-Manipulation/Fasta_file_combiner.c -o Fasta_file_combiner
 cc Fasta-Manipulation/Fasta_G2N.c -o Fasta_G2N
 cc Fasta-Manipulation/Fasta_gap_analyzer.c -o Fasta_gap_analyzer -lm
 cc Fasta-Manipulation/Fasta_gap_compressor.c -o Fasta_gap_compressor
+cc Fasta-Manipulation/Fasta_individualizer.c -o Fasta_individualizer
 cc Fasta-Manipulation/Fasta_interleaver.c -o Fasta_interleaver
 cc Fasta-Manipulation/Fasta_range_subset_extractor.c -o Fasta_range_subset_extractor
 cc Fasta-Manipulation/Fasta_read_extractor.c -o Fasta_read_extractor

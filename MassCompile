@@ -5,6 +5,7 @@ cc Fasta-Manipulation/Fasta_2_fastq.c -o Fasta_2_fastq
 cc Fasta-Manipulation/Fasta_2_gff3.c -o Fasta_2_gff3
 cc Fasta-Manipulation/Fasta_AMP_generator.c -o Fasta_AMP_generator
 cc Fasta-Manipulation/Fasta_APE_generator.c -o Fasta_APE_generator
+cc Fasta-Manipulation/Fasta_chunker.ca -o Fasta_chunker
 cc Fasta-Manipulation/Fasta_file_combiner.c -o Fasta_file_combiner
 cc Fasta-Manipulation/Fasta_G2N.c -o Fasta_G2N
 cc Fasta-Manipulation/Fasta_gap_analyzer.c -o Fasta_gap_analyzer -lm

@@ -84,7 +84,7 @@ void chunkFasta (FILE *inFile, FILE *outFile, int chunkSize) {
             }
         }
 //Print the title
-        fprintf (outFile, ">%s_%d-%d\n", title.str, pos, pos + chunkSize - 1);
+        fprintf (outFile, ">%s:%d-%d\n", title.str, pos, pos + chunkSize - 1);
 //Copy sequence
         while (in != '>') {
 //Stop conditions
@@ -94,7 +94,7 @@ void chunkFasta (FILE *inFile, FILE *outFile, int chunkSize) {
             if (in != '\n') {
                 fprintf (outFile, "%c", in);
                 if (pos++ % chunkSize == 0) {
-                    fprintf (outFile, "\n>%s_%d-%d\n", title.str, pos, pos + chunkSize - 1);
+                    fprintf (outFile, "\n>%s:%d-%d\n", title.str, pos, pos + chunkSize - 1);
                 }
             }
             in = fgetc (inFile);

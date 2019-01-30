@@ -49,33 +49,23 @@ int main (int argC, char *argV[]) {
 
 //Parse them individually
 void chunkFasta (FILE *inFile, FILE *outFile, int chunkSize) {
-printf ("1\n");
 //Local variables
     char in;
     string title;
     int count = 0, pos;
 //Skip headers
     in = fgetc (inFile);
-printf ("1\n");
     while (in != '>') {
-printf ("1a\n");
         in = fgetc (inFile);
-printf ("1b\n");
 //Stop conditions
-printf ("1c\n");
         if (((ferror (inFile)) || (feof (inFile)))) {
-printf ("1d\n");
             printf ("ERROR: Fasta file improperly formatted!\n");
-printf ("1e\n");
             exit (2);
         }
-printf ("1f\n");
     }
 //Loop it
-printf ("2\n");
     while (1) {
 //Stop conditions
-printf ("3\n");
         if (((ferror (inFile)) || (feof (inFile)))) {
             break;
         }
@@ -84,7 +74,6 @@ printf ("3\n");
         pos = 0;
 //Load title
         initializeString (&title);
-printf ("4\n");
         while (in != '\n') {
             readValueToString (&title, in);
             in = fgetc (inFile);
@@ -97,7 +86,6 @@ printf ("4\n");
 //Print the title
         fprintf (outFile, ">%s_%d-%d\n", title.str, pos + 1, pos + chunkSize);
 //Copy sequence
-printf ("5\n");
         while (in != '>') {
 //Stop conditions
             if (((ferror (inFile)) || (feof (inFile)))) {
@@ -111,7 +99,6 @@ printf ("5\n");
             }
             in = fgetc (inFile);
         }
-printf ("6\n");
 //Close the outFile and reset the string
         free (title.str);
         title.len = 0;

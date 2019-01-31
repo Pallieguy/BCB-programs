@@ -172,10 +172,10 @@ void loadFastaList (fastaEntry *firFasta, FILE *inFile) {
             if (((ferror (inFile)) || (feof (inFile)))) {
                 break;
             }        
-            in = fgetc (inFile);
             if (in != '\n') {
                 readValueToString (&(curFasta)->seq, in);
             }
+            in = fgetc (inFile);
         }
 //Load the next node
         curFasta->next = malloc (sizeof (fastaEntry));
@@ -238,8 +238,8 @@ void parseRange (FILE *inFile, fastaEntry *firFasta, char *fileName) {
 //Loop variable
             FILE *outFile = NULL;
 //Create the output file
-            suffix = malloc (22);
-            sprintf (suffix, "_%d-%d.fa", start, stop);
+            suffix = malloc (title.len + 23);
+            sprintf (suffix, "_%s:%d-%d.fa", title.str, start, stop);
             createOutputFile (&outFile, fileName, NULL, suffix);
 //Print the title
             fprintf (outFile, ">%s:%d-%d\n", curFasta->title.str, start, stop);

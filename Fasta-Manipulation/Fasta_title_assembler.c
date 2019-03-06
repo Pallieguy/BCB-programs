@@ -104,7 +104,7 @@ void createOutputFile (FILE **outFile, char *inName) {
     }
     fileName[j] = '\0';
 //Allow for the added text EDIT THIS AT COPY
-    outTitle = malloc (j + 3);
+    outTitle = malloc (j + 4);
     outTitle[0] = '\0';
     strcat (outTitle, fileName);
     strcat (outTitle, ".fa");

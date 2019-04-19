@@ -146,6 +146,10 @@ void findTitle (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
 //Burn the rest of the line
         while (in != '\n') {
             in = fgetc (inFile);
+//Break conditions
+            if (((ferror (inFile)) || (feof (inFile)))) {
+                break;
+            }
         }
 //Find the title in the fastaEntry list
         while (strcmp (title.str, curFasta->title.str) != 0) {

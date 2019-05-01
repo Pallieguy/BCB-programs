@@ -20,6 +20,7 @@ cc Fasta-Manipulation/Fasta_sorter.c -o Fasta_sorter
 cc Fasta-Manipulation/Fasta_title_assembler.c -o Fasta_title_assembler
 cc Fasta-Manipulation/Fasta_title_parser.c -o Fasta_title_parser
 cc Fasta-Manipulation/Fasta_title_subset_assembler.c -o Fasta_title_subset_assembler
+cc Fastq-Manipulation/Fastq_2_fasta.c -o Fastq_2_fasta
 cc Fastq-Manipulation/Fastq_AMP_generator.c -o Fastq_AMP_generator
 cc Fastq-Manipulation/Fastq_coverage_parser.c -o Fastq_coverage_parser
 cc Fastq-Manipulation/Fastq_data_parser.c -o Fastq_data_parser

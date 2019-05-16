@@ -1,4 +1,5 @@
 #Need to update this to actually install everything from the git
+cc BLAST-Manipulation/BLAST_2_gff.c -o BLAST_2_gff3
 cc BLAST-Manipulation/BLAST_parser.c -o BLAST_parser
 cc BLAST-Maniuplation/BLAST_PoI_best_output_parser -o BLAST_PoI_best_output_parser
 cc BLAST-Manipulation/BLAST_title_corrector.c -o BLAST_title_corrector

@@ -1,6 +1,6 @@
 #Need to update this to actually install everything from the git
 cc BLAST-Manipulation/BLAST_parser.c -o BLAST_parser
-cc BLAST-Maniuplation/BLAST_PoI_best_output_parser -o BLAST_PoI_best_output_parser
+cc BLAST-Maniuplation/BLAST_best_output_parser -o BLAST_PoI_best_output_parser
 cc BLAST-Manipulation/BLAST_title_corrector.c -o BLAST_title_corrector
 cc Fasta-Manipulation/Fasta_2_fastq.c -o Fasta_2_fastq
 cc Fasta-Manipulation/Fasta_2_gff3.c -o Fasta_2_gff3
@@ -51,6 +51,7 @@ cc Misc/Fasta_G2N_comparator.c -o Fasta_G2N_comparator
 cc Misc/K_finder.c -o K_finder
 cc Misc/Novoalign_parser_PE.c -o Novoalign_parser_PE
 cc Misc/Novoalign_parser_SE.c -o Novoalign_parser_SE
+cc Misc/PoI_gff_generator.c -o PoI_gff_generator
 cc Misc/Title_comparator.c -o Title_comparator
 cc Misc/Title_interleaver.c -o Title_interleaver
 cc Misc/Title_numberer.c -o Title_numberer

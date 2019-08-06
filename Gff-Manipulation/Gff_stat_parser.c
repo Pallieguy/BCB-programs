@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
     FILE *inFile = NULL;
     string source, type;
     char in;
-    int maker_count = 0, augustus_count = 0, snap_count = 0, genemark_count = 0, blastn_count = 0, blastx_count = 0, est2genome_count = 0, protein2genome_count = 0, repeatmasker_count = 0, repeatrunner_count = 0, LTRharvest_count = 0, LTR_Finder_count = 0, TRF_count = 0, tRNAscan_count = 0, gene_count = 0, TE_count = 0, count = 0, tblastx_count = 0, cdna2genome_count = 0;
+    int maker_count = 0, augustus_count = 0, snap_count = 0, genemark_count = 0, blastn_count = 0, blastx_count = 0, est2genome_count = 0, protein2genome_count = 0, repeatmasker_count = 0, repeatrunner_count = 0, LTRharvest_count = 0, LTR_Finder_count = 0, TRF_count = 0, tRNAscan_count = 0, gene_count = 0, TE_count = 0, count = 0, tblastx_count = 0, cdna2genome_count = 0, mRNA_count = 0, exon_count = 0, CDS_count = 0, five_prime_UTR_count = 0, three_prime_UTR_count = 0;
 //File creation and checks
     printf ("Opening files...\n");
     createFile (&inFile, argv[1], 'r');
@@ -102,6 +102,16 @@ int main (int argc, char *argv[]) {
             tRNAscan_count++;
         } else if (strcmp (type.str, "gene") == 0) {
             gene_count++;
+        } else if (strcmp (type.str, "mRNA") == 0) {
+            mRNA_count++;
+        } else if (strcmp (type.str, "exon") == 0) {
+            exon_count++;
+        } else if (strcmp (type.str, "CDS") == 0) {
+            CDS_count++;
+        } else if (strcmp (type.str, "five_prime_UTR") == 0) {
+            five_prime_UTR_count++;
+        } else if (strcmp (type.str, "three_prime_UTR") == 0) {
+            three_prime_UTR_count++;
         } else if (strcmp (type.str, "transposable_element") == 0) {
             TE_count++;
         }
@@ -113,7 +123,7 @@ int main (int argc, char *argv[]) {
         reinitializeString (&type);
     }
 //Display the stats
-    printf ("%d entries process.  All stats Parsed.\n\t###MAKER Matches###\nMAKER Consensus Genes:\t%d\nAugustus Matches:\t%d\nsnap Matches:\t\t%d\nGenemark Matches:\t%d\nBLASTn Matches:\t\t%d\nBLASTx Matches:\t\t%d\ntBLASTx Matches:\t%d\nest2genome Matches:\t%d\nprotein2genome Matches:\t%d\ncdna2genome Matches:\t%d\nRepeatMasker Matches:\t%d\nRepeatrunner Matches:\t%d\n\t###Other Annotations###\nLTRharvest Matches:\t%d\nLTR_Finder Matches:\t%d\nTRF Matches:\t\t%d\ntRNAscan Matches:\t%d\n\t###Generic Matches###\nGenes:\t\t\t%d\nTransposable Elements:\t%d\n", count, maker_count, augustus_count, snap_count, genemark_count, blastn_count, blastx_count, tblastx_count, est2genome_count, protein2genome_count, cdna2genome_count, repeatmasker_count, repeatrunner_count, LTRharvest_count, LTR_Finder_count, TRF_count, tRNAscan_count, gene_count, TE_count);
+    printf ("%d entries process.  All stats Parsed.\n\t###MAKER Matches###\nMAKER Consensus Genes:\t%d\nAugustus Matches:\t%d\nsnap Matches:\t\t%d\nGenemark Matches:\t%d\nBLASTn Matches:\t\t%d\nBLASTx Matches:\t\t%d\ntBLASTx Matches:\t%d\nest2genome Matches:\t%d\nprotein2genome Matches:\t%d\ncdna2genome Matches:\t%d\nRepeatMasker Matches:\t%d\nRepeatrunner Matches:\t%d\n\t###Other Annotations###\nLTRharvest Matches:\t%d\nLTR_Finder Matches:\t%d\nTRF Matches:\t\t%d\ntRNAscan Matches:\t%d\n\t###Generic Matches###\nGenes:\t\t\t%d\nmRNAs:\t\t\t%d\nExons:\t\t\t%d\nCDSs:\t\t\t%d\n5' UTRs:\t\t%d\n3' UTRs:\t\t%d\nTransposable Elements:\t%d\n", count, maker_count, augustus_count, snap_count, genemark_count, blastn_count, blastx_count, tblastx_count, est2genome_count, protein2genome_count, cdna2genome_count, repeatmasker_count, repeatrunner_count, LTRharvest_count, LTR_Finder_count, TRF_count, tRNAscan_count, gene_count, mRNA_count, exon_count, CDS_count, five_prime_UTR_count, three_prime_UTR_count, TE_count);
 //Close everything and free memory
     free (source.str);
     free (type.str);

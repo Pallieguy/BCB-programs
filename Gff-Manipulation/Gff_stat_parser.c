@@ -102,7 +102,7 @@ int main (int argc, char *argv[]) {
             tRNAscan_count++;
         } else if (strcmp (type.str, "gene") == 0) {
             gene_count++;
-        } else if (strcmp (type.str, "transcricpt") == 0) {
+        } else if (strcmp (type.str, "transcript") == 0) {
             transcript_count++;
         } else if (strcmp (type.str, "mRNA") == 0) {
             mRNA_count++;
@@ -125,7 +125,7 @@ int main (int argc, char *argv[]) {
         reinitializeString (&type);
     }
 //Display the stats
-    printf ("%d entries process.  All stats Parsed.\n\t###MAKER Matches###\nMAKER Consensus Genes:\t%d\nAugustus Matches:\t%d\nsnap Matches:\t\t%d\nGenemark Matches:\t%d\nBLASTn Matches:\t\t%d\nBLASTx Matches:\t\t%d\ntBLASTx Matches:\t%d\nest2genome Matches:\t%d\nprotein2genome Matches:\t%d\ncdna2genome Matches:\t%d\nRepeatMasker Matches:\t%d\nRepeatrunner Matches:\t%d\n\t###Other Annotations###\nLTRharvest Matches:\t%d\nLTR_Finder Matches:\t%d\nTRF Matches:\t\t%d\ntRNAscan Matches:\t%d\n\t###Generic Matches###\nGenes:\t\t\t%d\nTrasnscripts:\t\t%d\nmRNAs:\t\t\t%d\nExons:\t\t\t%d\nCDSs:\t\t\t%d\n5' UTRs:\t\t%d\n3' UTRs:\t\t%d\nTransposable Elements:\t%d\n", count, maker_count, augustus_count, snap_count, genemark_count, blastn_count, blastx_count, tblastx_count, est2genome_count, protein2genome_count, cdna2genome_count, repeatmasker_count, repeatrunner_count, LTRharvest_count, LTR_Finder_count, TRF_count, tRNAscan_count, gene_count, transcript_count, mRNA_count, exon_count, CDS_count, five_prime_UTR_count, three_prime_UTR_count, TE_count);
+    printf ("%d entries process.  All stats Parsed.\n\t###MAKER Matches###\nMAKER Consensus Genes:\t%d\nAugustus Matches:\t%d\nsnap Matches:\t\t%d\nGenemark Matches:\t%d\nBLASTn Matches:\t\t%d\nBLASTx Matches:\t\t%d\ntBLASTx Matches:\t%d\nest2genome Matches:\t%d\nprotein2genome Matches:\t%d\ncdna2genome Matches:\t%d\nRepeatMasker Matches:\t%d\nRepeatrunner Matches:\t%d\n\t###Other Annotations###\nLTRharvest Matches:\t%d\nLTR_Finder Matches:\t%d\nTRF Matches:\t\t%d\ntRNAscan Matches:\t%d\n\t###Generic Matches###\nGenes:\t\t\t%d\nTranscripts:\t\t%d\nmRNAs:\t\t\t%d\nExons:\t\t\t%d\nCDSs:\t\t\t%d\n5' UTRs:\t\t%d\n3' UTRs:\t\t%d\nTransposable Elements:\t%d\n", count, maker_count, augustus_count, snap_count, genemark_count, blastn_count, blastx_count, tblastx_count, est2genome_count, protein2genome_count, cdna2genome_count, repeatmasker_count, repeatrunner_count, LTRharvest_count, LTR_Finder_count, TRF_count, tRNAscan_count, gene_count, transcript_count, mRNA_count, exon_count, CDS_count, five_prime_UTR_count, three_prime_UTR_count, TE_count);
 //Close everything and free memory
     free (source.str);
     free (type.str);

@@ -46,6 +46,7 @@ cc Mauve-Manipulation/Mauve_title_corrector.c -o Mauve_title_corrector
 cc Mauve-Manipulation/Mauve_title_parser.c -o Mauve_title_parser
 cc Misc/Blank_line_remover.c -o Blank_line_remover
 cc Misc/CSV_sorter.c -o CSV_sorter
+cc Misc/Cufflinks_XLOC_annotation_parser -o Cufflinks_XLOC_annotation_parser
 cc Misc/cummeRbund_gene_counter.c -o cummeRbund_gene_counter
 cc Misc/Edge_align_filter.c -o Edge_align_filter
 cc Misc/Fasta_G2N_comparator.c -o Fasta_G2N_comparator

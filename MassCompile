@@ -43,6 +43,7 @@ cc Gff-Manipulation/Gff_contig_title_parser.c -o Gff_contig_title_parser
 cc Gff-Manipulation/Gff_fasta_compiler.c -o Gff_fasta_compiler
 cc Gff-Manipulation/Gff_sorter.c -o Gff_sorter
 cc Gff-Manipulation/Gff_stat_parser.c -o Gff_stat_parser
+cc Gff-Manipulation/Phytozome_gff_fasta_compiler.c -o Phytozome_gff_fasta_compiler
 cc Mauve-Manipulation/Mauve_clustal_converter.c -o Mauve_clustal_converter
 cc Mauve-Manipulation/Mauve_title_corrector.c -o Mauve_title_corrector
 cc Mauve-Manipulation/Mauve_title_parser.c -o Mauve_title_parser

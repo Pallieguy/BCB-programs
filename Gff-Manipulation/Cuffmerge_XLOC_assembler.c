@@ -219,17 +219,17 @@ void loadFastaEntries (fastaEntry *firFasta, FILE *inFile) {
 void parseXLOCEntries (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
 //Local variables
     char in, dir, curDir;
-    int count = 0;
+    int count = 0, loc = 1;
     long i = 0, start = 0, end = 0, curStart = 0, curEnd = 0;
-    string scaffold, sequence, xloc, curScaffold, curXLOC;
+    string scaffold, xloc, curScaffold, curXLOC;
     fastaEntry *curFasta = NULL;
 //prep the cur* strings
     initializeString (&curScaffold);
     initializeString (&curXLOC);
+    in = fgetc (inFile);
 //Loop the entire process per line of the GTF
     while (1) {
 //Stop conditions
-        in = fgetc (inFile);
         if (((ferror (inFile)) || (feof (inFile)))) {
             break;
         }
@@ -273,20 +273,25 @@ void parseXLOCEntries (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
             readValueToString (&xloc, in);
             in = fgetc (inFile);
         }
-//If it's the first or the same xloc
-        if ((curXLOC.len == 1) || (strcmp (xloc.str, curXLOC.str) == 0)) {
-//Special handle for the first xloc
-            if (curXLOC.len == 1) {
-                for (i = 0; i < xloc.len; i++) {
-                    readValueToString (&curXLOC, xloc.str[i]);
-                }
-                for (i = 0; i < scaffold.len; i++) {
-                    readValueToString (&curScaffold, scaffold.str[i]);
-                }
-                curStart = start;
-                curEnd = end;
-                curDir = dir;
+//Skip to the end of the line
+        while (in != '\n') {
+            in = fgetc (inFile);
+        }
+        in = fgetc (inFile);
+//If it's the first xloc
+        if (curXLOC.len == 1) {
+            for (i = 0; i < xloc.len; i++) {
+                readValueToString (&curXLOC, xloc.str[i]);
             }
+            for (i = 0; i < scaffold.len; i++) {
+                readValueToString (&curScaffold, scaffold.str[i]);
+            }
+            curStart = start;
+            curEnd = end;
+            curDir = dir;
+        }
+//If the XLOCs match
+        if (strcmp (xloc.str, curXLOC.str) == 0) {
 //Direction and scaffold must match
             if (dir != curDir) {
                 printf ("%s has strand mismatch!\n", xloc.str);
@@ -303,8 +308,9 @@ void parseXLOCEntries (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
             if (curEnd < end) {
                 curEnd = end;
             }
-//If the xlocs don't match
-        } else {
+//If the xlocs don't match or the file is done
+        }
+        if ((strcmp (xloc.str, curXLOC.str) != 0) || (feof (inFile))) {
 //Find the corresponding scaffold
             curFasta = firFasta;
             while (strcmp (curFasta->title.str, curScaffold.str) != 0) {
@@ -315,49 +321,18 @@ void parseXLOCEntries (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
                     exit (1);
                 }
             }
-            initializeString (&sequence);
-//Copy the sequence substring
-            if (curDir == '+') {
-                for (i = (curStart - 1); i < (curEnd - 1); i++) {
-                    if ((curFasta->sequence.str[i] == 'G') || (curFasta->sequence.str[i] == 'g')) {
-                        readValueToString (&sequence, 'G');
-                    } else if ((curFasta->sequence.str[i] == 'A') || (curFasta->sequence.str[i] == 'a')) {
-                        readValueToString (&sequence, 'A');
-                    } else if ((curFasta->sequence.str[i] == 'C') || (curFasta->sequence.str[i] == 'c')) {
-                        readValueToString (&sequence, 'C');
-                    } else if ((curFasta->sequence.str[i] == 'T') || (curFasta->sequence.str[i] == 't')) {
-                        readValueToString (&sequence, 'T');
-                    } else {
-                        readValueToString (&sequence, 'N');
-                    }
-                }
-//Invert the sequence if need be
-            } else {
-                for (i = (curEnd - 1); i > (curStart - 1); i--) {
-                    if ((curFasta->sequence.str[i] == 'G') || (curFasta->sequence.str[i] == 'g')) {
-                        readValueToString (&sequence, 'C');
-                    } else if ((curFasta->sequence.str[i] == 'A') || (curFasta->sequence.str[i] == 'a')) {
-                        readValueToString (&sequence, 'T');
-                    } else if ((curFasta->sequence.str[i] == 'C') || (curFasta->sequence.str[i] == 'c')) {
-                        readValueToString (&sequence, 'G');
-                    } else if ((curFasta->sequence.str[i] == 'T') || (curFasta->sequence.str[i] == 't')) {
-                        readValueToString (&sequence, 'A');
-                    } else {
-                        readValueToString (&sequence, 'N');
-                    }
-                }
-            }
-//Print the found data in fasta format
+//Print the title
             fprintf (outFile, ">%s:%li-%li(%c)_%s\n", curScaffold.str, curStart, curEnd, curDir, curXLOC.str);
-            for (i = 0; i < (sequence.len - 1); i++) {
-                fprintf (outFile, "%c", sequence.str[i]);
-                if ((i > 1) && ((i + 1) % 80 == 0)) {
+//Print the found data in fasta format
+            loc = 1;
+            for (i = (curStart - 1); i < (curEnd - 1); i++) {
+                fprintf (outFile, "%c", curFasta->sequence.str[i]);
+                if (loc++ % 80 == 0) {
                     fprintf (outFile, "\n");
                 }
             }
             fprintf (outFile, "\n");
 //Reset strings
-            free (sequence.str);
             free (curXLOC.str);
             free (curScaffold.str);
             initializeString (&curXLOC);
@@ -376,10 +351,6 @@ void parseXLOCEntries (fastaEntry *firFasta, FILE *inFile, FILE *outFile) {
             if (++count % 10000 == 0) {
                 printf ("%d XLOCs parsed...\n", count);
             }
-        }
-//Skip to the end of the line
-        while (in != '\n') {
-            in = fgetc (inFile);
         }
 //Reset entry values
         free (scaffold.str);

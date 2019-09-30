@@ -63,10 +63,6 @@ int main (int argc, char *argv[]) {
             readValueToString (&type, in);
             in = fgetc (inFile);
         }
-//Burn the rest of the line and reset the strings
-        while (in != '\n') {
-            in = fgetc (inFile);
-        }
 //Increase the counts as they appear /*ADD NEW SOURCES HERE */
         if ((strcmp (source.str, "maker") == 0) && (strcmp (type.str, "gene") == 0)) {
             maker_count++;
@@ -120,6 +116,15 @@ int main (int argc, char *argv[]) {
 //A counter so the user has some idea of how long it will take
         if (++count % 100000 == 0) {
             printf ("%d entries processed...\n", count);
+        }
+//Burn the rest of the line and reset the strings
+        while (in != '\n') {
+            if (((ferror (inFile)) || (feof (inFile)))) {
+                source.str = NULL;
+                break;
+            }
+
+            in = fgetc (inFile);
         }
         reinitializeString (&source);
         reinitializeString (&type);

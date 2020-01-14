@@ -1,15 +1,14 @@
-#Need to update this to actually install everything from the git
 cc BLAST-Manipulation/BLAST_2_gff3.c -o BLAST_2_gff3
-cc BLAST-Manipulation/BLAST_parser.c -o BLAST_parser
 cc BLAST-Manipulation/BLAST_PoI_best_output_parser.c -o BLAST_PoI_best_output_parser
+cc BLAST-Manipulation/BLAST_parser.c -o BLAST_parser
 cc BLAST-Manipulation/BLAST_title_corrector.c -o BLAST_title_corrector
 cc Fasta-Manipulation/Fasta_2_fastq.c -o Fasta_2_fastq
 cc Fasta-Manipulation/Fasta_2_gff3.c -o Fasta_2_gff3
 cc Fasta-Manipulation/Fasta_AMP_generator.c -o Fasta_AMP_generator
 cc Fasta-Manipulation/Fasta_APE_generator.c -o Fasta_APE_generator
+cc Fasta-Manipulation/Fasta_G2N.c -o Fasta_G2N
 cc Fasta-Manipulation/Fasta_chunker.c -o Fasta_chunker
 cc Fasta-Manipulation/Fasta_file_combiner.c -o Fasta_file_combiner
-cc Fasta-Manipulation/Fasta_G2N.c -o Fasta_G2N
 cc Fasta-Manipulation/Fasta_gap_analyzer.c -o Fasta_gap_analyzer -lm
 cc Fasta-Manipulation/Fasta_gap_compressor.c -o Fasta_gap_compressor
 cc Fasta-Manipulation/Fasta_individualizer.c -o Fasta_individualizer
@@ -21,12 +20,12 @@ cc Fasta-Manipulation/Fasta_sorter.c -o Fasta_sorter
 cc Fasta-Manipulation/Fasta_title_assembler.c -o Fasta_title_assembler
 cc Fasta-Manipulation/Fasta_title_parser.c -o Fasta_title_parser
 cc Fasta-Manipulation/Fasta_title_subset_assembler.c -o Fasta_title_subset_assembler
-cc Fastq-Manipulation/Fastq_2_fasta.c -o Fastq_2_fasta
+cc Fasta-Manipulation/Fastq_2_fasta.c -o Fastq_2_fasta
 cc Fastq-Manipulation/Fastq_AMP_generator.c -o Fastq_AMP_generator
 cc Fastq-Manipulation/Fastq_coverage_parser.c -o Fastq_coverage_parser
 cc Fastq-Manipulation/Fastq_data_parser.c -o Fastq_data_parser
-cc Fastq-Manipulation/Fastq_interleaver.c -o Fastq_interleaver
 cc Fastq-Manipulation/Fastq_interleave_separator.c -o Fastq_interleave_separator
+cc Fastq-Manipulation/Fastq_interleaver.c -o Fastq_interleaver
 cc Fastq-Manipulation/Fastq_length_check.c -o Fastq_length_check
 cc Fastq-Manipulation/Fastq_linker_trimmer.c -o Fastq_linker_trimmer
 cc Fastq-Manipulation/Fastq_size_sorter.c -o Fastq_size_sorter
@@ -34,14 +33,14 @@ cc Fastq-Manipulation/Fastq_sort_check.c -o Fastq_sort_check
 cc Fastq-Manipulation/Fastq_sorter.c -o Fastq_sorter
 cc Fastq-Manipulation/Fastq_synchronizer.c -o Fastq_synchronizer
 cc Fastq-Manipulation/Fastq_title_parser.c -o Fast_title_parser
+cc Gff-Manipulation/Cufflinks_XLOC_annotation_parser.c -o Cufflinks_XLOC_annotation_parser
 cc Gff-Manipulation/Cufflinks_transcript_assembler.c -o Cufflinks_transcript_assembler
 cc Gff-Manipulation/Cufflinks_transcript_counter.c -o Cufflinks_transcript_counter
-cc Gff-Manipulation/Cufflinks_XLOC_annotation_parser -o Cufflinks_XLOC_annotation_parser
-cc Gff-Manipulation/Cufflinks_XLOC_assembler -o Cufflinks_XLOC_assembler
+cc Gff-Manipulation/Cuffmerge_XLOC_assembler.c -o Cuffmerge_XLOC_assembler.c
 cc Gff-Manipulation/Cuffmerge_transcript_assembler.c -o Cuffmerge_transcript_assembler
 cc Gff-Manipulation/Gff_contig_title_parser.c -o Gff_contig_title_parser
 cc Gff-Manipulation/Gff_fasta_compiler.c -o Gff_fasta_compiler
-cc Gff-Manipulation/Gff_name_parser.c -o Gff_name_parser
+cc Gff-Manipulation/Gff_naem_parser.c -o Gff_name_parser
 cc Gff-Manipulation/Gff_sorter.c -o Gff_sorter
 cc Gff-Manipulation/Gff_stat_parser.c -o Gff_stat_parser
 cc Gff-Manipulation/Phytozome_gff_fasta_compiler.c -o Phytozome_gff_fasta_compiler
@@ -50,7 +49,6 @@ cc Mauve-Manipulation/Mauve_title_corrector.c -o Mauve_title_corrector
 cc Mauve-Manipulation/Mauve_title_parser.c -o Mauve_title_parser
 cc Misc/Blank_line_remover.c -o Blank_line_remover
 cc Misc/CSV_sorter.c -o CSV_sorter
-cc Misc/cummeRbund_gene_counter.c -o cummeRbund_gene_counter
 cc Misc/Edge_align_filter.c -o Edge_align_filter
 cc Misc/Fasta_G2N_comparator.c -o Fasta_G2N_comparator
 cc Misc/K_finder.c -o K_finder
@@ -62,12 +60,13 @@ cc Misc/Title_interleaver.c -o Title_interleaver
 cc Misc/Title_numberer.c -o Title_numberer
 cc Misc/Title_uniqueness_parser.c -o Title_uniqueness_parser
 cc Misc/Title_uniqueness_verifier.c -o Title_uniqueness_verifier
+cc Misc/cummeRbund_gene_counter.c -o cummeRbund_gene_counter
 cc Protein-Protein-Interaction/PPI_AA_frequency_compiler.c -o PPI_AA_frequency_compiler
 cc Protein-Protein-Interaction/PPI_fasta_web_querier.c -o PPI_fasta_web_querier -lcurl
 cc Pseudochromosomes/Pseudochromosome_assembler.c -o Pseudochromosome_assembler
 cc Pseudochromosomes/Pseudochromosome_gff_updater.c -o Pseudochromosome_gff_updater
-cc TEs/LTRharvest_gff_corrector.c -o LTRharvest_gff_corrector
 cc TEs/LTR_Finder_gff_generator.c -o LTR_Finder_gff_generator
+cc TEs/LTRharvest_gff_corrector.c -o LTRharvest_gff_corrector
 cc TEs/TRF_gff_generator.c -o TRF_gff_generator
 cc TEs/tRNAscan_gff_generator.c -o tRNAscan_gff_generator
 echo Be sure to add directory to PATH

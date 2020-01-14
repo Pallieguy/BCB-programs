@@ -226,7 +226,6 @@ void loadTitles (node *firNode, FILE *inFile) {
                     in = fgetc (inFile);
                 }
 //Prep the next node
-
                 curNode->next = malloc (sizeof (*curNode));
                 initializeNode (curNode->next);
                 curNode = curNode->next;

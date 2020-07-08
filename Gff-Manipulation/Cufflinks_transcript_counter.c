@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
     FILE *inFile = NULL;
     string type;
     char in;
-    int transcriptCount = 0, exonCount = 0, otherCount = 0, count = 0;
+    int transcriptCount = 0, exonCount = 0, otherCount = 0, count = 0, start = 0, end = 0, length = 0, tlongest = 0, tshortest = 0, tmean = 0, elongest = 0, eshortest = 0, emean = 0;
 //File creation and checks
     printf ("Opening files...\n");
     createFile (&inFile, argv[1], 'r');
@@ -57,6 +57,42 @@ int main (int argc, char *argv[]) {
             readValueToString (&type, in);
             in = fgetc (inFile);
         }
+//Read the start and stop
+        fscanf (inFile, "%d%d", &start, &end);
+        length = end - start;
+//Sort by type
+        if (strcmp (type.str, "transcript") == 0) {
+            if (tshortest == 0) {
+               tshortest = length;
+            } else {
+                if (length < tshortest) {
+                    tshortest = length;
+                }
+            }
+            if (tlongest == 0) {
+                tlongest = length;
+            } else {
+                if (length > tlongest) {
+                    tlongest = length;
+                }
+            }
+            tmean += length;
+        } else if (strcmp (type.str, "exon") == 0) {
+            if (eshortest == 0) {
+               eshortest = length;
+            } else {
+                if (length < eshortest) {
+                    eshortest = length;
+                }
+            }
+            if (elongest == 0) {
+                if (length > elongest) {
+                    elongest = length;
+                }
+            }
+            emean += length;
+        }
+        in = fgetc (inFile);
 //Burn the rest of the line
         while (in != '\n') {
             in = fgetc (inFile);
@@ -77,7 +113,9 @@ int main (int argc, char *argv[]) {
         in = fgetc (inFile);
     }
 //Display the stats
-    printf ("%d entries process.  All stats Parsed.\nTranscipts\t%d\nExons\t\t%d\nOther\t\t%d\n", count, transcriptCount, exonCount, otherCount);
+    tmean /= transcriptCount;
+    emean /= exonCount;
+    printf ("%d entries process.  All stats Parsed. (Count: shortest-longest, mean)\nTranscipts\t%d:\t%d-%d, %d\nExons\t\t%d:\t%d-%d, %d\nOther\t\t%d\n", count, transcriptCount, tshortest, tlongest, tmean, exonCount, eshortest, elongest, emean, otherCount);
 //Close everything and free memory
     free (type.str);
     fclose (inFile);
